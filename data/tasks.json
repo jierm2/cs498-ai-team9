@@ -1,0 +1,11 @@
+[
+    {
+        "id": "frac_01",
+        "topic": "fractions",
+        "misconception": "add numerators and denominators separately",
+        "simulator_prompt": "You believe 1/2 + 1/3 = 2/5 because you add top and bottom separately.",
+        "transfer_question": "What is 1/3 + 1/4?",
+        "correct_answer": "7/12",
+        "max_turns": 6
+    }
+]
