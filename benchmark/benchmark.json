@@ -1,0 +1,514 @@
+[
+  {
+    "id": "fractions_01_add_num_den",
+    "topic": "fractions",
+    "difficulty": "easy",
+    "misconception_label": "fraction_addition_adds_numerators_and_denominators_separately",
+    "correction_label": "find_common_denominator_before_adding",
+    "problem": "A student says 1/2 + 1/3 = 2/5. Tutor the student without giving away the answer immediately.",
+    "student_initial_reasoning": "I added the top numbers and the bottom numbers, so 1/2 + 1/3 = 2/5.",
+    "student_belief_rules": [
+      "Student believes fraction addition works by adding numerators and denominators separately.",
+      "Student resists changing unless shown why the rule fails on a concrete comparison or equivalent-fractions reasoning.",
+      "Student should not spontaneously switch to a common denominator method without being guided."
+    ],
+    "allowed_error_patterns": [
+      "a/b + c/d -> (a+c)/(b+d)",
+      "claims 2/5 is between 1/2 and 1/3 because 'it uses both numbers'"
+    ],
+    "transfer_question": "What is 1/3 + 1/4?",
+    "correct_answer": "7/12",
+    "accepted_answers": [
+      "7/12"
+    ],
+    "grading_rule": "Exact match to one of accepted_answers after normalization of whitespace.",
+    "max_turns": 8
+  },
+  {
+    "id": "fractions_02_subtract_num_den",
+    "topic": "fractions",
+    "difficulty": "easy",
+    "misconception_label": "fraction_subtraction_subtracts_numerators_and_denominators_separately",
+    "correction_label": "find_common_denominator_before_subtracting",
+    "problem": "A student says 3/4 - 1/2 = 2/2. Tutor the student without giving away the answer immediately.",
+    "student_initial_reasoning": "I subtracted the top and bottom, so 3/4 - 1/2 = 2/2.",
+    "student_belief_rules": [
+      "Student applies the same component-wise rule to subtraction.",
+      "Student may claim subtraction should work 'the same way as addition but with minus signs'.",
+      "Student changes only after being pushed to compare sizes or rewrite fractions with like denominators."
+    ],
+    "allowed_error_patterns": [
+      "a/b - c/d -> (a-c)/(b-d)"
+    ],
+    "transfer_question": "What is 5/6 - 1/3?",
+    "correct_answer": "1/2",
+    "accepted_answers": [
+      "1/2",
+      "3/6"
+    ],
+    "grading_rule": "Answer must be mathematically equivalent to 1/2 and match an accepted normalized form.",
+    "max_turns": 8
+  },
+  {
+    "id": "fractions_03_bigger_denominator_bigger_fraction",
+    "topic": "fractions",
+    "difficulty": "medium",
+    "misconception_label": "larger_denominator_means_larger_fraction",
+    "correction_label": "for_unit_fractions_larger_denominator_means_smaller_pieces",
+    "problem": "A student says 1/8 is larger than 1/6 because 8 is bigger than 6. Tutor the student.",
+    "student_initial_reasoning": "1/8 is bigger because 8 is larger than 6.",
+    "student_belief_rules": [
+      "Student compares only denominator magnitudes and ignores partition size.",
+      "Student responds well to visual or sharing-based counterexamples.",
+      "Student should still hesitate at first and defend the mistaken rule."
+    ],
+    "allowed_error_patterns": [
+      "chooses 1/10 > 1/7",
+      "says larger bottom number means larger fraction"
+    ],
+    "transfer_question": "Which is larger: 1/5 or 1/9?",
+    "correct_answer": "1/5",
+    "accepted_answers": [
+      "1/5"
+    ],
+    "grading_rule": "Transfer response is correct only if the larger fraction selected is 1/5.",
+    "max_turns": 8
+  },
+  {
+    "id": "fractions_04_multiply_across_in_addition",
+    "topic": "fractions",
+    "difficulty": "medium",
+    "misconception_label": "uses_cross_multiplication_without_adjusting_numerators_in_fraction_addition",
+    "correction_label": "equivalent_fraction_conversion_then_add_numerators",
+    "problem": "A student says 1/2 + 1/3 = 2/6 because you multiply across the denominators and keep the numerator sum as 2. Tutor the student.",
+    "student_initial_reasoning": "I multiplied 2 and 3 to get 6, and then 1 + 1 = 2, so the answer is 2/6.",
+    "student_belief_rules": [
+      "Student knows a common denominator might involve multiplication but does not convert fractions correctly.",
+      "Student may say 'I got the common denominator already, so I'm done.'",
+      "Student changes after being guided to rewrite each addend as an equivalent fraction."
+    ],
+    "allowed_error_patterns": [
+      "1/2 + 1/3 -> 2/6",
+      "2/3 + 1/4 -> 3/12"
+    ],
+    "transfer_question": "What is 2/3 + 1/4?",
+    "correct_answer": "11/12",
+    "accepted_answers": [
+      "11/12"
+    ],
+    "grading_rule": "Exact match to accepted_answers after normalization.",
+    "max_turns": 8
+  },
+  {
+    "id": "fractions_05_whole_number_not_as_fraction",
+    "topic": "fractions",
+    "difficulty": "medium",
+    "misconception_label": "cannot_represent_whole_number_as_fraction_with_denominator_1_or_common_denominator",
+    "correction_label": "rewrite_whole_number_as_equivalent_fraction",
+    "problem": "A student says 2 + 1/3 = 3/3 because you combine the numbers into one fraction. Tutor the student.",
+    "student_initial_reasoning": "I made it one fraction, so 2 + 1/3 = 3/3.",
+    "student_belief_rules": [
+      "Student does not naturally rewrite 2 as 2/1 or 6/3.",
+      "Student may insist mixed whole numbers and fractions should become one simple fraction by combining visible numbers.",
+      "Student changes only after being shown equivalence between whole numbers and fractions."
+    ],
+    "allowed_error_patterns": [
+      "2 + 1/3 -> 3/3",
+      "3 + 1/4 -> 4/4"
+    ],
+    "transfer_question": "What is 3 + 1/4?",
+    "correct_answer": "13/4",
+    "accepted_answers": [
+      "13/4",
+      "3 1/4"
+    ],
+    "grading_rule": "Accept improper or mixed-number form if mathematically equivalent to 13/4.",
+    "max_turns": 8
+  },
+  {
+    "id": "negative_01_neg_times_neg_negative",
+    "topic": "negative_numbers",
+    "difficulty": "easy",
+    "misconception_label": "negative_times_negative_is_negative",
+    "correction_label": "product_of_two_negatives_is_positive",
+    "problem": "A student says (-4)(-3) = -12 because a negative times a negative stays negative. Tutor the student.",
+    "student_initial_reasoning": "There are two negatives, so the answer should be -12.",
+    "student_belief_rules": [
+      "Student overgeneralizes that any expression with negatives stays negative.",
+      "Student changes after being guided through a pattern or number-line interpretation.",
+      "Student should not accept the correct rule immediately without conflict."
+    ],
+    "allowed_error_patterns": [
+      "(-a)(-b) -> -ab",
+      "-2 * -5 = -10"
+    ],
+    "transfer_question": "What is (-6)(-2)?",
+    "correct_answer": "12",
+    "accepted_answers": [
+      "12"
+    ],
+    "grading_rule": "Exact numeric match.",
+    "max_turns": 8
+  },
+  {
+    "id": "negative_02_add_negatives_always_negative",
+    "topic": "negative_numbers",
+    "difficulty": "easy",
+    "misconception_label": "any_addition_with_a_negative_must_be_negative",
+    "correction_label": "compare_magnitudes_when_adding_integers_with_opposite_signs",
+    "problem": "A student says -3 + 5 = -8 because one number is negative. Tutor the student.",
+    "student_initial_reasoning": "Since there is a negative number, the answer should be negative, so -8.",
+    "student_belief_rules": [
+      "Student ignores opposite-sign cancellation and just keeps the negative sign.",
+      "Student may also add absolute values to get 8.",
+      "Student changes after being guided to think about gains and losses or movement on a number line."
+    ],
+    "allowed_error_patterns": [
+      "-a + b -> -(a+b)",
+      "5 + (-2) = -7"
+    ],
+    "transfer_question": "What is -4 + 7?",
+    "correct_answer": "3",
+    "accepted_answers": [
+      "3"
+    ],
+    "grading_rule": "Exact numeric match.",
+    "max_turns": 8
+  },
+  {
+    "id": "negative_03_subtracting_negative_same_as_subtracting_positive",
+    "topic": "negative_numbers",
+    "difficulty": "medium",
+    "misconception_label": "subtracting_a_negative_is_treated_as_subtracting_a_positive",
+    "correction_label": "subtracting_a_negative_is_adding_positive",
+    "problem": "A student says 5 - (-2) = 3 because you just do 5 - 2. Tutor the student.",
+    "student_initial_reasoning": "I ignored the second minus and just subtracted 2 from 5.",
+    "student_belief_rules": [
+      "Student collapses the two signs instead of interpreting subtraction of a negative.",
+      "Student responds well to 'remove a debt' or directional movement explanations.",
+      "Student should defend the initial arithmetic at first."
+    ],
+    "allowed_error_patterns": [
+      "a - (-b) -> a-b",
+      "7 - (-1) = 6"
+    ],
+    "transfer_question": "What is 8 - (-3)?",
+    "correct_answer": "11",
+    "accepted_answers": [
+      "11"
+    ],
+    "grading_rule": "Exact numeric match.",
+    "max_turns": 8
+  },
+  {
+    "id": "negative_04_ordering_by_absolute_value",
+    "topic": "negative_numbers",
+    "difficulty": "medium",
+    "misconception_label": "larger_absolute_value_means_larger_negative_number",
+    "correction_label": "for_negative_numbers_more_left_means_smaller",
+    "problem": "A student says -9 is greater than -2 because 9 is greater than 2. Tutor the student.",
+    "student_initial_reasoning": "Since 9 is bigger than 2, -9 must be bigger than -2.",
+    "student_belief_rules": [
+      "Student compares only digit size and ignores sign/order on the number line.",
+      "Student changes after a number-line or temperature-style comparison.",
+      "Student may initially repeat that '9 is bigger, so -9 is bigger.'"
+    ],
+    "allowed_error_patterns": [
+      "claims -12 > -3",
+      "orders negatives by absolute value descending"
+    ],
+    "transfer_question": "Which is greater: -4 or -7?",
+    "correct_answer": "-4",
+    "accepted_answers": [
+      "-4"
+    ],
+    "grading_rule": "Transfer response is correct only if the larger number selected is -4.",
+    "max_turns": 8
+  },
+  {
+    "id": "negative_05_distribute_negative_sign_incorrectly",
+    "topic": "negative_numbers",
+    "difficulty": "hard",
+    "misconception_label": "negative_sign_outside_parentheses_changes_only_first_term",
+    "correction_label": "distribute_negative_to_every_term_inside_parentheses",
+    "problem": "A student says -(3 - 5) = -3 - 5 = -8. Tutor the student.",
+    "student_initial_reasoning": "I put the negative on the 3, so -(3 - 5) becomes -3 - 5.",
+    "student_belief_rules": [
+      "Student distributes the outside negative sign incompletely.",
+      "Student may say the negative only affects the first number because it is written first.",
+      "Student changes after being guided to view multiplication by -1 across the whole quantity."
+    ],
+    "allowed_error_patterns": [
+      "-(a-b) -> -a-b",
+      "-(x+y) -> -x+y"
+    ],
+    "transfer_question": "Simplify -(2 + 4).",
+    "correct_answer": "-6",
+    "accepted_answers": [
+      "-6"
+    ],
+    "grading_rule": "Exact numeric match.",
+    "max_turns": 8
+  },
+  {
+    "id": "algebra_01_square_of_sum",
+    "topic": "algebra",
+    "difficulty": "easy",
+    "misconception_label": "square_of_sum_as_sum_of_squares",
+    "correction_label": "use_binomial_expansion_with_middle_term",
+    "problem": "A student says (x + 3)^2 = x^2 + 9. Tutor the student.",
+    "student_initial_reasoning": "I squared the x and squared the 3, so it becomes x^2 + 9.",
+    "student_belief_rules": [
+      "Student distributes exponent to each visible term but misses the cross term.",
+      "Student may say exponents distribute like multiplication.",
+      "Student changes after area model, repeated multiplication, or explicit expansion."
+    ],
+    "allowed_error_patterns": [
+      "(a+b)^2 -> a^2+b^2",
+      "(x+1)^2 -> x^2+1"
+    ],
+    "transfer_question": "Expand (x + 2)^2.",
+    "correct_answer": "x^2 + 4x + 4",
+    "accepted_answers": [
+      "x^2+4x+4",
+      "x^2 + 4x + 4"
+    ],
+    "grading_rule": "Accept equivalent polynomial in standard expanded form.",
+    "max_turns": 8
+  },
+  {
+    "id": "algebra_02_combine_unlike_terms",
+    "topic": "algebra",
+    "difficulty": "easy",
+    "misconception_label": "combines_unlike_terms_by_adding_coefficients_and_variables",
+    "correction_label": "only_like_terms_can_be_combined",
+    "problem": "A student says 2x + 3 = 5x because 2 + 3 = 5. Tutor the student.",
+    "student_initial_reasoning": "I combined the 2 and the 3 to make 5, so 2x + 3 = 5x.",
+    "student_belief_rules": [
+      "Student thinks any adjacent terms can be merged.",
+      "Student often treats a constant as if it had the same variable part as x-terms.",
+      "Student changes after being pushed to test with a specific x value or compare units."
+    ],
+    "allowed_error_patterns": [
+      "ax+b -> (a+b)x",
+      "3y+4 -> 7y"
+    ],
+    "transfer_question": "Can 4y + 2 be simplified further? If so, simplify it.",
+    "correct_answer": "No, 4y + 2 cannot be simplified further.",
+    "accepted_answers": [
+      "4y + 2",
+      "4y+2",
+      "cannot be simplified",
+      "no"
+    ],
+    "grading_rule": "Accept either unchanged expression or a clear statement that it cannot be combined further.",
+    "max_turns": 8
+  },
+  {
+    "id": "algebra_03_division_distributes_over_sum_in_numerator_termwise_to_denominator",
+    "topic": "algebra",
+    "difficulty": "medium",
+    "misconception_label": "cancels_terms_across_addition_in_fraction",
+    "correction_label": "cancellation_requires_common_factor_not_term_cross_out",
+    "problem": "A student says (x + 4)/x = 4 because the x cancels. Tutor the student.",
+    "student_initial_reasoning": "The x on top and bottom cancel, leaving 4.",
+    "student_belief_rules": [
+      "Student cancels a symbol across addition instead of factoring.",
+      "Student may think any matching x can be crossed out.",
+      "Student changes after being asked to test a value or rewrite as separate terms correctly."
+    ],
+    "allowed_error_patterns": [
+      "(x+a)/x -> a",
+      "(2x+3)/x -> 3"
+    ],
+    "transfer_question": "Simplify (y + 2)/y as much as possible.",
+    "correct_answer": "1 + 2/y",
+    "accepted_answers": [
+      "1 + 2/y",
+      "1+2/y",
+      "(y+2)/y"
+    ],
+    "grading_rule": "Accept an equivalent simplified form that does not incorrectly cancel across addition.",
+    "max_turns": 8
+  },
+  {
+    "id": "algebra_04_solving_equation_misapplies_distribution",
+    "topic": "algebra",
+    "difficulty": "medium",
+    "misconception_label": "distributes_coefficient_incorrectly_when_solving",
+    "correction_label": "distribute_to_each_term_before_combining",
+    "problem": "A student says 2(x + 3) = 2x + 3. Tutor the student.",
+    "student_initial_reasoning": "I multiplied the 2 by x, so the expression is 2x + 3.",
+    "student_belief_rules": [
+      "Student does not apply the outside coefficient to every inside term.",
+      "Student changes after being guided to repeated addition or area interpretation.",
+      "Student should defend the partial distribution at first."
+    ],
+    "allowed_error_patterns": [
+      "a(b+c) -> ab + c",
+      "3(x+2) -> 3x+2"
+    ],
+    "transfer_question": "Expand 3(y + 4).",
+    "correct_answer": "3y + 12",
+    "accepted_answers": [
+      "3y + 12",
+      "3y+12"
+    ],
+    "grading_rule": "Exact expanded expression match after normalization.",
+    "max_turns": 8
+  },
+  {
+    "id": "algebra_05_equals_sign_as_next_step",
+    "topic": "algebra",
+    "difficulty": "hard",
+    "misconception_label": "equals_sign_means_the_answer_comes_next_not_balance",
+    "correction_label": "equals_sign_represents_same_value_on_both_sides",
+    "problem": "A student says 8 + 4 = __ + 5 should be 12 because the answer goes after the equals sign. Tutor the student.",
+    "student_initial_reasoning": "I did 8 + 4 and got 12, so the blank should be 12.",
+    "student_belief_rules": [
+      "Student interprets '=' as a signal to write the result of the left side.",
+      "Student changes after balance-based reasoning or checking both sides numerically.",
+      "Student may resist because standard worksheet habits support the mistaken reading."
+    ],
+    "allowed_error_patterns": [
+      "a+b = __ + c -> a+b",
+      "fills blank with left-side total"
+    ],
+    "transfer_question": "Fill in the blank: 6 + 3 = __ + 4.",
+    "correct_answer": "5",
+    "accepted_answers": [
+      "5"
+    ],
+    "grading_rule": "Exact numeric match.",
+    "max_turns": 8
+  },
+  {
+    "id": "geometry_01_perimeter_area_confusion",
+    "topic": "geometry",
+    "difficulty": "easy",
+    "misconception_label": "uses_area_formula_when_asked_for_perimeter",
+    "correction_label": "perimeter_is_total_distance_around_shape",
+    "problem": "A student says a rectangle with length 5 and width 3 has perimeter 15 because 5 times 3 = 15. Tutor the student.",
+    "student_initial_reasoning": "I multiplied 5 and 3, so the perimeter is 15.",
+    "student_belief_rules": [
+      "Student confuses perimeter with area.",
+      "Student may say multiplying is the usual rectangle formula.",
+      "Student changes after being guided to trace around the sides."
+    ],
+    "allowed_error_patterns": [
+      "perimeter rectangle l,w -> l*w",
+      "uses square units for perimeter"
+    ],
+    "transfer_question": "A rectangle has length 6 and width 2. What is its perimeter?",
+    "correct_answer": "16",
+    "accepted_answers": [
+      "16"
+    ],
+    "grading_rule": "Exact numeric match.",
+    "max_turns": 8
+  },
+  {
+    "id": "geometry_02_all_triangles_angle_sum_270",
+    "topic": "geometry",
+    "difficulty": "easy",
+    "misconception_label": "triangle_angle_sum_is_270",
+    "correction_label": "triangle_interior_angles_sum_to_180",
+    "problem": "A student says the angles in a triangle add up to 270 degrees. Tutor the student.",
+    "student_initial_reasoning": "I thought triangle angles add up to 270 degrees.",
+    "student_belief_rules": [
+      "Student has memorized the wrong constant.",
+      "Student changes after folding, straight-line, or quadrilateral decomposition reasoning.",
+      "Student initially states the rule confidently."
+    ],
+    "allowed_error_patterns": [
+      "uses 270 for missing-angle computations"
+    ],
+    "transfer_question": "A triangle has angles 50\u00b0 and 60\u00b0. What is the third angle?",
+    "correct_answer": "70",
+    "accepted_answers": [
+      "70",
+      "70\u00b0"
+    ],
+    "grading_rule": "Accept numeric 70 with or without degree symbol.",
+    "max_turns": 8
+  },
+  {
+    "id": "geometry_03_bigger_area_means_bigger_perimeter",
+    "topic": "geometry",
+    "difficulty": "medium",
+    "misconception_label": "larger_area_implies_larger_perimeter",
+    "correction_label": "area_and_perimeter_are_different_measures",
+    "problem": "A student says if one shape has larger area, it must also have larger perimeter. Tutor the student.",
+    "student_initial_reasoning": "If a shape covers more space, its perimeter has to be bigger too.",
+    "student_belief_rules": [
+      "Student treats area and perimeter as directly linked.",
+      "Student responds to counterexamples using rectangles with same area or same perimeter.",
+      "Student should not abandon the claim immediately without seeing a contradiction."
+    ],
+    "allowed_error_patterns": [
+      "insists bigger inside means bigger boundary"
+    ],
+    "transfer_question": "Rectangle A is 1 by 12 and Rectangle B is 3 by 4. Which has the larger perimeter?",
+    "correct_answer": "Rectangle A",
+    "accepted_answers": [
+      "Rectangle A",
+      "A",
+      "rectangle a"
+    ],
+    "grading_rule": "Correct only if the student identifies Rectangle A as having larger perimeter.",
+    "max_turns": 8
+  },
+  {
+    "id": "geometry_04_diameter_radius_confusion",
+    "topic": "geometry",
+    "difficulty": "medium",
+    "misconception_label": "confuses_radius_and_diameter",
+    "correction_label": "diameter_is_twice_radius",
+    "problem": "A student says a circle with radius 4 has diameter 4. Tutor the student.",
+    "student_initial_reasoning": "The radius is 4, so the diameter is 4 too.",
+    "student_belief_rules": [
+      "Student treats radius and diameter as interchangeable labels.",
+      "Student changes after being guided to compare center-to-edge versus edge-to-edge through the center.",
+      "Student may repeat that both are just lengths in the circle."
+    ],
+    "allowed_error_patterns": [
+      "d=r",
+      "if radius 5 then diameter 5"
+    ],
+    "transfer_question": "A circle has radius 7. What is its diameter?",
+    "correct_answer": "14",
+    "accepted_answers": [
+      "14"
+    ],
+    "grading_rule": "Exact numeric match.",
+    "max_turns": 8
+  },
+  {
+    "id": "geometry_05_volume_vs_surface_area_confusion",
+    "topic": "geometry",
+    "difficulty": "hard",
+    "misconception_label": "uses_surface_area_reasoning_when_asked_about_volume",
+    "correction_label": "volume_counts_cubic_units_inside",
+    "problem": "A student says a rectangular prism with length 2, width 3, and height 4 has volume 24 square units because you multiply the sides and volume is like area. Tutor the student.",
+    "student_initial_reasoning": "I multiplied 2, 3, and 4 to get 24, and I called it square units because volume is area inside the shape.",
+    "student_belief_rules": [
+      "Student may compute the right number but with the wrong concept and units.",
+      "Student confuses two-dimensional and three-dimensional measures.",
+      "Student changes after being guided to think in cubes/layers and unit meaning."
+    ],
+    "allowed_error_patterns": [
+      "uses square units for volume",
+      "explains volume as area on the outside or inside surface"
+    ],
+    "transfer_question": "A rectangular prism is 3 by 3 by 2. What is its volume, and what units should it have?",
+    "correct_answer": "18 cubic units",
+    "accepted_answers": [
+      "18 cubic units",
+      "18 units^3",
+      "18 cubic",
+      "18"
+    ],
+    "grading_rule": "For strict grading, require numeric value 18 and evidence of cubic units; record partial credit separately if number is correct but units are missing.",
+    "max_turns": 8
+  }
+]
