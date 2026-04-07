@@ -18,3 +18,14 @@ pip install -r requirements.txt
 ```
 
 Replace `your_api_key_here` in `.env` with your API key.
+
+## Run benchmark
+
+Use the canonical runner:
+
+```bash
+python benchmark/run_benchmark.py --limit 1
+python benchmark/run_benchmark.py
+```
+
+Results are saved under `benchmark/results/`.
