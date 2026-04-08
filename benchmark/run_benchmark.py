@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from fractions import Fraction
 from pathlib import Path
@@ -15,6 +16,18 @@ if str(PROJECT_ROOT) not in sys.path:
 
 DEFAULT_TASK_PATH = PROJECT_ROOT / "benchmark" / "benchmark.json"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "benchmark" / "results"
+
+
+def _task_file_for_record(tasks_path: Path) -> str:
+    """Store task file as a path relative to repo root when possible."""
+    resolved = tasks_path.resolve()
+    try:
+        return resolved.relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        try:
+            return resolved.relative_to(Path.cwd().resolve()).as_posix()
+        except ValueError:
+            return resolved.as_posix()
 
 
 def load_tasks(path: Path) -> list[dict]:
@@ -31,7 +44,6 @@ def normalize_task(task: dict) -> dict:
         or normalized.get("misconception_label")
         or "Unknown misconception"
     )
-
     normalized["misconception"] = misconception_text
     normalized["max_turns"] = int(normalized.get("max_turns", 8))
     return normalized
@@ -43,6 +55,40 @@ def _normalize_text(text: str) -> str:
     text = re.sub(r"\s+", " ", text)
     text = text.rstrip(".?!")
     return text
+
+
+def _extract_final_answer(text: str) -> str:
+    """Extract the student's final answer from potentially verbose responses.
+    Looks for explicit answer patterns first, then falls back to the last
+    numeric/math expression found."""
+    text = text.strip()
+
+    # Pattern 1: "my answer is X", "the answer is X", "I get X", "= X"
+    answer_patterns = [
+        r"(?:my |the |final )?answer\s*(?:is|:)\s*(.+?)(?:\.|$)",
+        r"(?:i get|i got|that gives|result is|equals?)\s*(.+?)(?:\.|$)",
+        r"=\s*(.+?)(?:\.|$)",
+    ]
+    for pattern in answer_patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            candidate = match.group(1).strip().rstrip(".!?,")
+            if candidate:
+                return candidate
+
+    # Pattern 2: if the whole response is short (< 30 chars), treat it as the answer
+    if len(text) < 30:
+        return text
+
+    # Pattern 3: extract the last numeric/fraction expression
+    # Search from the end of the text
+    all_nums = list(re.finditer(r"-?\d+(?:\s+\d+/\d+|\.\d+|/\d+)?", text))
+    if all_nums:
+        return all_nums[-1].group(0)
+
+    # Fallback: return last line
+    lines = [l.strip() for l in text.strip().split("\n") if l.strip()]
+    return lines[-1] if lines else text
 
 
 def _extract_numeric(text: str) -> str | None:
@@ -80,26 +126,34 @@ def _to_fraction(value: str) -> Fraction | None:
 
 
 def grade_transfer_answer(task: dict, student_answer: str) -> tuple[bool, str]:
+    """Grade the student's transfer answer against accepted answers.
+    Uses strict matching: exact text match or numeric equivalence only.
+    NO substring matching — this was causing false positives."""
+
     accepted = task.get("accepted_answers") or [task.get("correct_answer", "")]
     accepted = [str(a) for a in accepted if str(a).strip()]
 
-    answer_norm = _normalize_text(student_answer)
+    # Step 1: extract the core answer from potentially verbose response
+    extracted = _extract_final_answer(student_answer)
+    extracted_norm = _normalize_text(extracted)
+    full_norm = _normalize_text(student_answer)
+
     accepted_norm = [_normalize_text(a) for a in accepted]
 
-    if answer_norm in accepted_norm:
+    # Check exact match on extracted answer or full text
+    if extracted_norm in accepted_norm or full_norm in accepted_norm:
         return True, "exact"
 
-    if any(a in answer_norm for a in accepted_norm if len(a) >= 2):
-        return True, "substring"
-
-    answer_num = _extract_numeric(student_answer)
-    answer_frac = _to_fraction(answer_num) if answer_num else None
-    if answer_frac is not None:
-        for candidate in accepted:
-            candidate_num = _extract_numeric(candidate)
-            candidate_frac = _to_fraction(candidate_num) if candidate_num else None
-            if candidate_frac is not None and candidate_frac == answer_frac:
-                return True, "numeric-equivalent"
+    # Check numeric/fraction equivalence on extracted answer
+    for source in [extracted, student_answer]:
+        answer_num = _extract_numeric(source)
+        answer_frac = _to_fraction(answer_num) if answer_num else None
+        if answer_frac is not None:
+            for candidate in accepted:
+                candidate_num = _extract_numeric(candidate)
+                candidate_frac = _to_fraction(candidate_num) if candidate_num else None
+                if candidate_frac is not None and candidate_frac == answer_frac:
+                    return True, "numeric-equivalent"
 
     return False, "no-match"
 
@@ -112,7 +166,7 @@ def run_single_task(agent, task: dict, simulate_fn, verbose: bool = False) -> di
         nonlocal initial_reasoning_used
 
         sim_history.append({"role": "user", "text": prompt_text})
-        is_transfer = prompt_text.lower().startswith("now answer this question")
+        is_transfer = "now answer this question" in prompt_text.lower()
 
         if not initial_reasoning_used and task.get("student_initial_reasoning") and not is_transfer:
             student_response = str(task["student_initial_reasoning"])
@@ -136,8 +190,11 @@ def run_single_task(agent, task: dict, simulate_fn, verbose: bool = False) -> di
         "correct_answer": task.get("correct_answer", ""),
         "accepted_answers": task.get("accepted_answers", []),
         "student_transfer_answer": session.student_transfer_answer,
+        "student_extracted_answer": _extract_final_answer(session.student_transfer_answer),
         "turns_taken": session.turns_taken,
+        "dialogue_history": session.dialogue_history,
         "tracker": final_state,
+        "tracker_parse_failures": getattr(session, "tracker_parse_failures", 0),
         "diagnosed": bool(final_state.get("misconception_identified", False)),
         "counter_example_shown": bool(final_state.get("counter_example_shown", False)),
         "confirmed_correction": bool(final_state.get("confirmed_correction", False)),
@@ -164,6 +221,7 @@ def aggregate_summary(task_results: list[dict]) -> dict:
     diagnosed_rate = mean([1 if r["diagnosed"] else 0 for r in task_results]) if task_results else 0.0
     counter_example_rate = mean([1 if r["counter_example_shown"] else 0 for r in task_results]) if task_results else 0.0
     confirmed_rate = mean([1 if r["confirmed_correction"] else 0 for r in task_results]) if task_results else 0.0
+    total_parse_failures = sum(r.get("tracker_parse_failures", 0) for r in task_results)
 
     return {
         "total_tasks": total,
@@ -173,6 +231,7 @@ def aggregate_summary(task_results: list[dict]) -> dict:
         "diagnosed_rate": diagnosed_rate,
         "counter_example_shown_rate": counter_example_rate,
         "confirmed_correction_rate": confirmed_rate,
+        "total_tracker_parse_failures": total_parse_failures,
         "by_topic": by_topic,
     }
 
@@ -180,15 +239,17 @@ def aggregate_summary(task_results: list[dict]) -> dict:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run tutoring-agent benchmark against the student simulator.")
     parser.add_argument("--tasks", type=Path, default=DEFAULT_TASK_PATH, help="Path to benchmark tasks JSON.")
-    parser.add_argument(
-        "--output-dir",
-        type=Path,
-        default=DEFAULT_OUTPUT_DIR,
-        help="Directory where result JSON files will be written.",
-    )
-    parser.add_argument("--limit", type=int, default=0, help="Run only the first N tasks (0 = all tasks).")
+    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help="Directory for result JSON files.")
+    parser.add_argument("--limit", type=int, default=0, help="Run only the first N tasks (0 = all).")
     parser.add_argument("--task-id", type=str, default="", help="Run only a specific task ID.")
-    parser.add_argument("--verbose", action="store_true", help="Print turn-by-turn tutor/student dialogue.")
+    parser.add_argument("--verbose", action="store_true", help="Print turn-by-turn dialogue.")
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=3,
+        metavar="N",
+        help="Concurrent tasks (Vertex QPM ~60–300; default 3 to limit 429s).",
+    )
     return parser.parse_args()
 
 
@@ -210,32 +271,43 @@ def main() -> int:
 
     if args.task_id:
         tasks = [t for t in tasks if t.get("id") == args.task_id]
-
     if args.limit and args.limit > 0:
         tasks = tasks[: args.limit]
-
     if not tasks:
         raise ValueError("No tasks selected. Check --task-id/--limit settings.")
 
     agent = TutoringAgent()
     task_results: list[dict] = []
 
-    for i, task in enumerate(tasks, start=1):
-        print(f"[{i}/{len(tasks)}] Running task: {task.get('id')}")
-        try:
-            result = run_single_task(agent, task, simulate_student, verbose=args.verbose)
-            task_results.append(result)
-            status = "PASS" if result["passed"] else "FAIL"
-            print(f"  -> {status} | transfer_answer={result['student_transfer_answer']}")
-        except Exception as exc:
-            error_result = {
-                "task_id": task.get("id"),
-                "topic": task.get("topic", "unknown"),
-                "passed": False,
-                "error": str(exc),
-            }
-            task_results.append(error_result)
-            print(f"  -> ERROR | {exc}")
+    workers = max(1, min(args.workers, len(tasks)))
+    print(f"Running {len(tasks)} task(s) with up to {workers} concurrent worker(s) (Vertex QPM limits apply).")
+
+    def run_task_wrapper(task: dict) -> dict:
+        return run_single_task(agent, task, simulate_student, verbose=args.verbose)
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(run_task_wrapper, t): t for t in tasks}
+        for future in as_completed(futures):
+            task = futures[future]
+            tid = task.get("id")
+            try:
+                result = future.result()
+                task_results.append(result)
+                status = "PASS" if result["passed"] else "FAIL"
+                print(
+                    f"  -> {status} ({result['grading_mode']}) | {tid} | "
+                    f"extracted=\"{result['student_extracted_answer']}\" | "
+                    f"correct=\"{result['correct_answer']}\""
+                )
+            except Exception as exc:
+                error_result = {
+                    "task_id": tid,
+                    "topic": task.get("topic", "unknown"),
+                    "passed": False,
+                    "error": str(exc),
+                }
+                task_results.append(error_result)
+                print(f"  -> ERROR | {tid} | {exc}")
 
     valid_results = [r for r in task_results if "turns_taken" in r]
     summary = aggregate_summary(valid_results)
@@ -246,7 +318,7 @@ def main() -> int:
 
     payload = {
         "run_at": datetime.now().isoformat(),
-        "task_file": str(args.tasks),
+        "task_file": _task_file_for_record(args.tasks),
         "total_requested_tasks": len(tasks),
         "summary": summary,
         "results": task_results,
@@ -261,6 +333,7 @@ def main() -> int:
     print(f"Diagnosed rate: {summary['diagnosed_rate']:.1%}")
     print(f"Counter-example rate: {summary['counter_example_shown_rate']:.1%}")
     print(f"Confirmed correction rate: {summary['confirmed_correction_rate']:.1%}")
+    print(f"Tracker parse failures: {summary['total_tracker_parse_failures']}")
     print(f"Saved results to: {output_path}")
 
     return 0
