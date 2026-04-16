@@ -3,4 +3,3 @@
 noble-operation-492621-c6-*.json
 __pycache__/
 *.py[cod]
-benchmark/results/*.json
