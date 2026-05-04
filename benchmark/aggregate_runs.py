@@ -14,10 +14,12 @@ import argparse
 import json
 import statistics
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RESULTS_DIR = PROJECT_ROOT / "benchmark" / "results"
+DEFAULT_SUMMARY_FILENAME = "aggregated_summary.json"
 
 
 def load_run(path: Path) -> dict:
@@ -28,11 +30,14 @@ def load_run(path: Path) -> dict:
 def collect_runs(results_dir: Path) -> list[dict]:
     runs = []
     for path in sorted(results_dir.glob("*.json")):
-        if path.name.startswith("."):
+        if path.name.startswith(".") or path.name == DEFAULT_SUMMARY_FILENAME:
             continue
         try:
             payload = load_run(path)
         except json.JSONDecodeError:
+            continue
+        # Skip files that aren't per-trial run outputs (no per-task results array)
+        if not isinstance(payload.get("results"), list) or not payload.get("results"):
             continue
         agent_name = payload.get("agent_name") or _infer_agent_from_filename(path.name)
         trial_id = payload.get("trial_id") or _infer_trial_from_filename(path.name)
@@ -167,9 +172,67 @@ def print_per_task_table(runs: list[dict], by_agent: dict[str, list[dict]]) -> N
     print()
 
 
+def build_summary_payload(
+    runs: list[dict],
+    by_agent: dict[str, list[dict]],
+    results_dir: Path,
+) -> dict:
+    agents = sorted(by_agent.keys())
+    all_task_ids = sorted({
+        r.get("task_id") for run in runs for r in run["results"] if r.get("task_id")
+    })
+    matrices = {a: per_task_matrix(runs, a) for a in agents}
+
+    by_condition = {}
+    for agent, trials in by_agent.items():
+        accs = [t["accuracy"] for t in trials]
+        mean = statistics.mean(accs) if accs else 0.0
+        std = statistics.stdev(accs) if len(accs) > 1 else 0.0
+        by_condition[agent] = {
+            "n_trials": len(trials),
+            "mean_accuracy": mean,
+            "std_accuracy": std,
+            "trials": [
+                {
+                    "trial_id": t["trial_id"],
+                    "passed": t["passed"],
+                    "total": t["total"],
+                    "accuracy": t["accuracy"],
+                    "source_file": t["path"],
+                }
+                for t in trials
+            ],
+        }
+
+    per_task = {}
+    for tid in all_task_ids:
+        per_task[tid] = {}
+        for a in agents:
+            cell = matrices[a].get(tid, {})
+            per_task[tid][a] = {
+                trial: bool(passed)
+                for trial, passed in sorted(cell.items())
+            }
+
+    return {
+        "generated_at": datetime.now().isoformat(),
+        "results_dir": str(results_dir.relative_to(PROJECT_ROOT)) if results_dir.is_relative_to(PROJECT_ROOT) else str(results_dir),
+        "n_input_files": len(runs),
+        "input_files": sorted(run["path"].name for run in runs),
+        "by_condition": by_condition,
+        "per_task": per_task,
+    }
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR)
+    parser.add_argument(
+        "--summary-out",
+        type=Path,
+        default=None,
+        help=f"Where to write the aggregated summary JSON. Default: <results-dir>/{DEFAULT_SUMMARY_FILENAME}",
+    )
     return parser.parse_args()
 
 
@@ -187,6 +250,13 @@ def main() -> int:
     print_summary(by_agent)
     print_markdown_table(by_agent)
     print_per_task_table(runs, by_agent)
+
+    payload = build_summary_payload(runs, by_agent, args.results_dir)
+    summary_out = args.summary_out or (args.results_dir / DEFAULT_SUMMARY_FILENAME)
+    summary_out.parent.mkdir(parents=True, exist_ok=True)
+    with open(summary_out, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+    print(f"Wrote aggregated summary to: {summary_out}")
     return 0
 
 

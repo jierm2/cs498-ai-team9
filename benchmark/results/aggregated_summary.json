@@ -1,0 +1,444 @@
+{
+  "generated_at": "2026-05-04T16:49:11.078299",
+  "results_dir": "benchmark/results",
+  "n_input_files": 9,
+  "input_files": [
+    "ablation_no_recap_t1.json",
+    "ablation_no_recap_t2.json",
+    "ablation_no_recap_t3.json",
+    "agent_t1.json",
+    "agent_t2.json",
+    "agent_t3.json",
+    "baseline_t1.json",
+    "baseline_t2.json",
+    "baseline_t3.json"
+  ],
+  "by_condition": {
+    "agent_no_recap": {
+      "n_trials": 3,
+      "mean_accuracy": 0.38333333333333336,
+      "std_accuracy": 0.14433756729740646,
+      "trials": [
+        {
+          "trial_id": "trial1",
+          "passed": 11,
+          "total": 20,
+          "accuracy": 0.55,
+          "source_file": "ablation_no_recap_t1.json"
+        },
+        {
+          "trial_id": "trial2",
+          "passed": 6,
+          "total": 20,
+          "accuracy": 0.3,
+          "source_file": "ablation_no_recap_t2.json"
+        },
+        {
+          "trial_id": "trial3",
+          "passed": 6,
+          "total": 20,
+          "accuracy": 0.3,
+          "source_file": "ablation_no_recap_t3.json"
+        }
+      ]
+    },
+    "three_phase_agent": {
+      "n_trials": 3,
+      "mean_accuracy": 0.9666666666666667,
+      "std_accuracy": 0.05773502691896256,
+      "trials": [
+        {
+          "trial_id": "trial1",
+          "passed": 20,
+          "total": 20,
+          "accuracy": 1.0,
+          "source_file": "agent_t1.json"
+        },
+        {
+          "trial_id": "trial2",
+          "passed": 20,
+          "total": 20,
+          "accuracy": 1.0,
+          "source_file": "agent_t2.json"
+        },
+        {
+          "trial_id": "trial3",
+          "passed": 18,
+          "total": 20,
+          "accuracy": 0.9,
+          "source_file": "agent_t3.json"
+        }
+      ]
+    },
+    "baseline": {
+      "n_trials": 3,
+      "mean_accuracy": 0.5333333333333333,
+      "std_accuracy": 0.15275252316519464,
+      "trials": [
+        {
+          "trial_id": "trial1",
+          "passed": 14,
+          "total": 20,
+          "accuracy": 0.7,
+          "source_file": "baseline_t1.json"
+        },
+        {
+          "trial_id": "trial2",
+          "passed": 8,
+          "total": 20,
+          "accuracy": 0.4,
+          "source_file": "baseline_t2.json"
+        },
+        {
+          "trial_id": "trial3",
+          "passed": 10,
+          "total": 20,
+          "accuracy": 0.5,
+          "source_file": "baseline_t3.json"
+        }
+      ]
+    }
+  },
+  "per_task": {
+    "algebra_01_square_of_sum": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "algebra_02_combine_unlike_terms": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": true
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "algebra_03_division_distributes_over_sum_in_numerator_termwise_to_denominator": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "algebra_04_solving_equation_misapplies_distribution": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "algebra_05_equals_sign_as_next_step": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": false,
+        "trial2": true,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": false
+      }
+    },
+    "fractions_01_add_num_den": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "fractions_02_subtract_num_den": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": true
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "fractions_03_bigger_denominator_bigger_fraction": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "fractions_04_multiply_across_in_addition": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "fractions_05_whole_number_not_as_fraction": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "geometry_01_perimeter_area_confusion": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": true
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "geometry_02_all_triangles_angle_sum_270": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": false,
+        "trial2": true,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "geometry_03_bigger_area_means_bigger_perimeter": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "geometry_04_diameter_radius_confusion": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": true,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "geometry_05_volume_vs_surface_area_confusion": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "negative_01_neg_times_neg_negative": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": true
+      },
+      "baseline": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "negative_02_add_negatives_always_negative": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      },
+      "baseline": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "negative_03_subtracting_negative_same_as_subtracting_positive": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": false,
+        "trial2": true,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "negative_04_ordering_by_absolute_value": {
+      "agent_no_recap": {
+        "trial1": false,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      }
+    },
+    "negative_05_distribute_negative_sign_incorrectly": {
+      "agent_no_recap": {
+        "trial1": true,
+        "trial2": false,
+        "trial3": false
+      },
+      "baseline": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": true
+      },
+      "three_phase_agent": {
+        "trial1": true,
+        "trial2": true,
+        "trial3": false
+      }
+    }
+  }
+}
