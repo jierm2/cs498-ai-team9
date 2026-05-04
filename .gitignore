@@ -1,5 +1,15 @@
 .env
 /.venv/
-noble-operation-492621-c6-*.json
+.venv/
+# Service account credentials — never commit
+noble-operation-*.json
+*-service-account*.json
+*-credentials*.json
 __pycache__/
 *.py[cod]
+.DS_Store
+# Editor / IDE
+.idea/
+.vscode/
+# Claude Code session state (not project code)
+.claude/

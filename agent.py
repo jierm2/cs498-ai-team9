@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 _client = get_client()
-AGENT_MODEL   = "gemini-3.1-pro-preview"
+AGENT_MODEL   = "gemini-3-flash-preview"
 TRACKER_MODEL = "gemini-3-flash-preview"
 
 MAX_TRACKER_RETRIES = 2
@@ -149,29 +149,47 @@ No markdown, no explanation, no code fences. ONLY the JSON object.
 
 MOVE_PROBING = "probing"
 MOVE_CONFRONTING = "confronting"
+MOVE_TEACHING = "teaching"
 MOVE_CONFIRMING = "confirming"
 
 
 class DialoguePlanner:
+    def __init__(self, enable_teaching_move: bool = True) -> None:
+        self.enable_teaching_move = enable_teaching_move
+
     def select_move(self, state: TrackerState, max_turns: int, turns_remaining: int) -> str:
         if turns_remaining <= 1:
             return MOVE_CONFIRMING
 
         if not state.misconception_identified:
-            # Don't probe forever — after 2 probes, start confronting
-            if state.turn_count >= 2:
+            if state.turn_count >= 1:
                 return MOVE_CONFRONTING
             return MOVE_PROBING
 
         if not state.counter_example_shown:
             return MOVE_CONFRONTING
 
-        if state.student_shifting or state.confirmed_correction:
+        if state.confirmed_correction:
             return MOVE_CONFIRMING
 
-        # If confronted but student isn't shifting, try one more confrontation then confirm
-        if state.last_move == MOVE_CONFRONTING:
+        if not self.enable_teaching_move:
+            # Ablation: original probe→confront→confirm loop, no teaching turn.
+            if state.student_shifting:
+                return MOVE_CONFIRMING
+            if state.last_move == MOVE_CONFRONTING:
+                return MOVE_CONFIRMING
+            return MOVE_CONFRONTING
+
+        # After at least one confrontation, escalate to a teaching turn that
+        # names the correct rule and walks a worked example. This is what
+        # gets the simulator past the "locked" gate AND gives it a procedure
+        # to copy on the transfer test.
+        if state.last_move in (MOVE_CONFRONTING, MOVE_PROBING):
+            return MOVE_TEACHING
+
+        if state.last_move == MOVE_TEACHING:
             return MOVE_CONFIRMING
+
         return MOVE_CONFRONTING
 
     def describe_move(self, move: str, misconception: str) -> str:
@@ -181,12 +199,22 @@ class DialoguePlanner:
                 f"related to: {misconception}. Listen and probe to understand their thinking."
             ),
             MOVE_CONFRONTING: (
-                f"Present a concrete counter-example or logical contradiction that directly "
-                f"challenges: {misconception}. Make the conflict vivid and undeniable."
+                f"Present a concrete counter-example that directly challenges: {misconception}. "
+                f"Use specific small numbers and a real-world referent (money, pizza slices, "
+                f"physical objects) so the contradiction is undeniable to the student."
+            ),
+            MOVE_TEACHING: (
+                f"The student has seen the contradiction. Now name the correct rule that fixes "
+                f"the misconception '{misconception}', and walk through ONE complete worked "
+                f"example with different numbers than the transfer question, showing every step. "
+                f"You may state the rule and the example's answer — the goal is for the student "
+                f"to have a procedure they can imitate. Do NOT solve the transfer question "
+                f"itself, only a different example."
             ),
             MOVE_CONFIRMING: (
-                f"Test whether understanding has improved by asking a simpler variant of the "
-                f"concept related to: {misconception}, to see if the correction has stuck."
+                f"Ask the student to redo a small problem related to: {misconception} using the "
+                f"corrected method. Check whether they apply the rule correctly without giving "
+                f"the final answer."
             ),
         }.get(move, "Continue the dialogue appropriately.")
 
@@ -202,8 +230,7 @@ class SessionResult:
     tracker_parse_failures: int = 0
 
 
-class TutoringAgent:
-    _SYSTEM_PROMPT = """<OBJECTIVE>
+TUTOR_SYSTEM_PROMPT = """<OBJECTIVE>
 You are an expert math tutor. Help the student overcome a specific mathematical misconception through guided dialogue.
 </OBJECTIVE>
 
@@ -216,8 +243,14 @@ Do not repeat the same question or explanation you already gave.
 Do not give away the correct answer directly; do not state the final numerical result, closed-form answer, or canonical rule that fully resolves the task for the student.
 </CONSTRAINTS>"""
 
-    def __init__(self) -> None:
-        self.planner = DialoguePlanner()
+
+class TutoringAgent:
+    _SYSTEM_PROMPT = TUTOR_SYSTEM_PROMPT
+
+    def __init__(self, enable_teaching_move: bool = True, enable_transfer_recap: bool = True) -> None:
+        self.enable_teaching_move = enable_teaching_move
+        self.enable_transfer_recap = enable_transfer_recap
+        self.planner = DialoguePlanner(enable_teaching_move=enable_teaching_move)
 
     def run_session(self, task: dict, get_student_response=None, verbose: bool = False) -> SessionResult:
         tracker = MisconceptionTracker(task["misconception"])
@@ -254,18 +287,36 @@ Do not give away the correct answer directly; do not state the final numerical r
                     print("[Early exit: correction confirmed]")
                 break
 
-        # Transfer question with explicit short-answer instruction
-        transfer_prompt = (
-            f"<OBJECTIVE>\n"
-            f"Answer the following question on your own.\n"
-            f"</OBJECTIVE>\n\n"
-            f"<CONTEXT>\n"
-            f"{task['transfer_question']}\n"
-            f"</CONTEXT>\n\n"
-            f"<CONSTRAINTS>\n"
-            f"Give ONLY your final answer (a number, expression, or short phrase). No explanation.\n"
-            f"</CONSTRAINTS>"
-        )
+        # Transfer prompt scaffolds the student by reminding them of the corrected
+        # method we just taught. Without this, the simulator regresses to its
+        # misconception on a cold-start single-shot question.
+        if self.enable_transfer_recap:
+            recap = self._build_transfer_recap(dialogue_history)
+            transfer_prompt = (
+                f"<OBJECTIVE>\n"
+                f"Now answer this question, applying the corrected method we just discussed.\n"
+                f"</OBJECTIVE>\n\n"
+                f"<CONTEXT>\n"
+                f"{recap}\n\n"
+                f"Question: {task['transfer_question']}\n"
+                f"</CONTEXT>\n\n"
+                f"<CONSTRAINTS>\n"
+                f"Give ONLY your final answer (a number, expression, or short phrase). No explanation.\n"
+                f"</CONSTRAINTS>"
+            )
+        else:
+            # Ablation: original cold-start transfer prompt, no recap.
+            transfer_prompt = (
+                f"<OBJECTIVE>\n"
+                f"Answer the following question on your own.\n"
+                f"</OBJECTIVE>\n\n"
+                f"<CONTEXT>\n"
+                f"{task['transfer_question']}\n"
+                f"</CONTEXT>\n\n"
+                f"<CONSTRAINTS>\n"
+                f"Give ONLY your final answer (a number, expression, or short phrase). No explanation.\n"
+                f"</CONSTRAINTS>"
+            )
 
         if verbose:
             print(f"\n[Transfer Test] {task['transfer_question']}")
@@ -288,6 +339,16 @@ Do not give away the correct answer directly; do not state the final numerical r
             tracker_parse_failures=tracker.parse_failures,
         )
 
+    def _build_transfer_recap(self, dialogue_history: list[dict]) -> str:
+        """Pull the last 2 tutor turns as a short recap so the simulator has
+        the corrected method visible when answering the transfer question."""
+        tutor_turns = [t["content"] for t in dialogue_history if t.get("role") == "tutor"]
+        if not tutor_turns:
+            return "(no prior discussion)"
+        recap_turns = tutor_turns[-2:]
+        joined = "\n".join(f"- Tutor said: {t}" for t in recap_turns)
+        return f"Recap of what the tutor just taught:\n{joined}"
+
     def _generate_tutor_response(self, task: dict, dialogue_history: list[dict],
                                   state: TrackerState, move: str) -> str:
         move_desc = self.planner.describe_move(move, task["misconception"])
@@ -304,8 +365,29 @@ Do not give away the correct answer directly; do not state the final numerical r
         move_guard = {
             MOVE_PROBING: "On this turn, do not correct the student's misconception; probe only.",
             MOVE_CONFRONTING: "On this turn, do not fully resolve the contradiction by giving the final answer or the complete correct rule.",
+            MOVE_TEACHING: "On this turn, you MAY state the correct rule and fully solve a worked example with DIFFERENT numbers from the transfer question. Do NOT solve or reveal the answer to the transfer question itself.",
             MOVE_CONFIRMING: "On this turn, check understanding with a question or short task; do not lecture the full solution.",
         }.get(move, "")
+
+        # During teaching, we explicitly allow giving the rule + worked example;
+        # otherwise we suppress final-answer giveaway as before.
+        no_giveaway_clause = (
+            ""
+            if move == MOVE_TEACHING
+            else (
+                "Do not give away the correct answer directly; do not state the final numerical "
+                "result, closed-form answer, or canonical rule that fully resolves the task for "
+                "the student.\n"
+            )
+        )
+
+        transfer_q = task.get("transfer_question", "")
+        transfer_clause = (
+            f"You must NOT solve or reveal the answer to this exact transfer question: \"{transfer_q}\". "
+            "Use different numbers in any worked example."
+            if transfer_q
+            else ""
+        )
 
         user_prompt = f"""<OBJECTIVE>
 Write ONLY your next tutor message as plain dialogue (no role labels or prefixes).
@@ -326,7 +408,7 @@ Conversation so far:
 
 <CONSTRAINTS>
 {move_guard}
-Do not give away the correct answer directly; do not state the final numerical result, closed-form answer, or canonical rule that fully resolves the task for the student.
+{no_giveaway_clause}{transfer_clause}
 Do not repeat the same question or explanation you already gave in this session.
 Output only the tutor's next message—no headings, bullets, or meta-commentary about instructions.
 </CONSTRAINTS>"""

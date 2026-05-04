@@ -69,6 +69,24 @@ def parse_args() -> argparse.Namespace:
         help="Concurrent tasks (default 3).",
     )
     parser.add_argument("--verbose", action="store_true", help="Print per-task prompt/answer details.")
+    parser.add_argument(
+        "--trial-id",
+        type=str,
+        default="",
+        help="Trial identifier (e.g. 'trial1') stamped on every result for cross-trial aggregation.",
+    )
+    parser.add_argument(
+        "--agent-name",
+        type=str,
+        default="baseline",
+        help="Agent identifier stamped on every result.",
+    )
+    parser.add_argument(
+        "--label",
+        type=str,
+        default="",
+        help="Optional label appended to the result filename.",
+    )
     return parser.parse_args()
 
 
@@ -83,6 +101,8 @@ def _format_history(dialogue_history: list[dict]) -> str:
 
 
 def _generate_tutor_response(model: str, task: dict, dialogue_history: list[dict], client) -> str:
+    from agent import TUTOR_SYSTEM_PROMPT
+
     history_text = _format_history(dialogue_history)
     prompt = f"""<OBJECTIVE>
 Write ONLY your next tutor message as plain dialogue (no role labels or prefixes).
@@ -107,7 +127,7 @@ Output only the tutor's next message.
     response = client.models.generate_content(
         model=model,
         contents=[{"role": "user", "parts": [{"text": prompt}]}],
-        config={"temperature": 1.0},
+        config={"system_instruction": TUTOR_SYSTEM_PROMPT, "temperature": 1.0},
     )
     return (response.text or "").strip() or "Can you explain your reasoning step by step?"
 
@@ -241,7 +261,10 @@ def main() -> int:
     task_results: list[dict] = []
 
     def run_task_wrapper(task: dict) -> dict:
-        return run_single_task(args.model, task, client, verbose=args.verbose)
+        result = run_single_task(args.model, task, client, verbose=args.verbose)
+        result["trial_id"] = args.trial_id
+        result["agent_name"] = args.agent_name
+        return result
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {pool.submit(run_task_wrapper, t): t for t in tasks}
@@ -264,6 +287,8 @@ def main() -> int:
                     "passed": False,
                     "error": str(exc),
                     "model": args.model,
+                    "trial_id": args.trial_id,
+                    "agent_name": args.agent_name,
                 }
                 task_results.append(error_result)
                 print(f"  -> ERROR | {tid} | {exc}")
@@ -273,13 +298,16 @@ def main() -> int:
 
     run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = args.output_dir / f"llm_baseline_results_{run_ts}.json"
+    label_suffix = f"_{args.label}" if args.label else ""
+    output_path = args.output_dir / f"llm_baseline_results_{run_ts}{label_suffix}.json"
 
     payload = {
         "run_at": datetime.now().isoformat(),
         "benchmark_type": "llm_direct_baseline",
         "task_file": _task_file_for_record(args.tasks),
         "total_requested_tasks": len(tasks),
+        "trial_id": args.trial_id,
+        "agent_name": args.agent_name,
         "model": args.model,
         "summary": summary,
         "results": task_results,

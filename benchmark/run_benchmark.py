@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
 import re
 import sys
@@ -105,6 +106,25 @@ def _extract_numeric(text: str) -> str | None:
     return None
 
 
+def _is_pure_numeric(text: str) -> bool:
+    """True if `text` is a single number/fraction with no algebraic variables,
+    word qualifiers, or extra terms. Used to gate numeric-equivalence grading
+    so that 'x^2 + 4' isn't graded equal to 'x^2 + 4x + 4'."""
+    if not text:
+        return False
+    cleaned = text.strip().lower().replace("\u2212", "-")
+    # Strip a single trailing unit word like "feet", "units", "cubic units"
+    cleaned = re.sub(r"\s*(cubic\s+units?|units?|feet|ft|meters?|m|cm|inches?|in|degrees?|\u00b0)\s*$", "", cleaned)
+    cleaned = cleaned.strip()
+    # Allowed: optional sign, digits, optional decimal, optional fraction or mixed
+    pure_patterns = [
+        r"^-?\d+\s+\d+/\d+$",       # mixed: "1 2/3"
+        r"^-?\d+/\d+$",              # fraction: "7/12"
+        r"^-?\d+(?:\.\d+)?$",         # int/decimal: "12", "-3", "1.5"
+    ]
+    return any(re.fullmatch(p, cleaned) for p in pure_patterns)
+
+
 def _to_fraction(value: str) -> Fraction | None:
     v = value.strip().lower().replace("\u2212", "-")
     v = re.sub(r"\s+", " ", v)
@@ -144,12 +164,17 @@ def grade_transfer_answer(task: dict, student_answer: str) -> tuple[bool, str]:
     if extracted_norm in accepted_norm or full_norm in accepted_norm:
         return True, "exact"
 
-    # Check numeric/fraction equivalence on extracted answer
-    for source in [extracted, student_answer]:
-        answer_num = _extract_numeric(source)
+    # Numeric/fraction equivalence: ONLY apply when both the student's extracted
+    # answer AND the candidate are purely numeric (no algebraic variables or
+    # extra terms). Otherwise "x^2 + 4" would grade equal to "x^2 + 4x + 4"
+    # because _extract_numeric pulls just the first number it finds.
+    if _is_pure_numeric(extracted):
+        answer_num = _extract_numeric(extracted)
         answer_frac = _to_fraction(answer_num) if answer_num else None
         if answer_frac is not None:
             for candidate in accepted:
+                if not _is_pure_numeric(candidate):
+                    continue
                 candidate_num = _extract_numeric(candidate)
                 candidate_frac = _to_fraction(candidate_num) if candidate_num else None
                 if candidate_frac is not None and candidate_frac == answer_frac:
@@ -250,6 +275,34 @@ def parse_args() -> argparse.Namespace:
         metavar="N",
         help="Concurrent tasks (Vertex QPM ~60–300; default 3 to limit 429s).",
     )
+    parser.add_argument(
+        "--no-teaching-move",
+        action="store_true",
+        help="Ablation: disable the teaching move in the planner.",
+    )
+    parser.add_argument(
+        "--no-transfer-recap",
+        action="store_true",
+        help="Ablation: disable the transfer-question recap (cold-start transfer prompt).",
+    )
+    parser.add_argument(
+        "--label",
+        type=str,
+        default="",
+        help="Optional label appended to the result filename (e.g. 'ablation_no_teaching').",
+    )
+    parser.add_argument(
+        "--trial-id",
+        type=str,
+        default="",
+        help="Trial identifier (e.g. 'trial1') stamped on every result for cross-trial aggregation.",
+    )
+    parser.add_argument(
+        "--agent-name",
+        type=str,
+        default="three_phase",
+        help="Agent identifier stamped on every result (e.g. 'three_phase', 'ablation_no_teaching').",
+    )
     return parser.parse_args()
 
 
@@ -276,28 +329,61 @@ def main() -> int:
     if not tasks:
         raise ValueError("No tasks selected. Check --task-id/--limit settings.")
 
-    agent = TutoringAgent()
+    agent = TutoringAgent(
+        enable_teaching_move=not args.no_teaching_move,
+        enable_transfer_recap=not args.no_transfer_recap,
+    )
     task_results: list[dict] = []
 
     workers = max(1, min(args.workers, len(tasks)))
     print(f"Running {len(tasks)} task(s) with up to {workers} concurrent worker(s) (Vertex QPM limits apply).")
 
     def run_task_wrapper(task: dict) -> dict:
-        return run_single_task(agent, task, simulate_student, verbose=args.verbose)
+        result = run_single_task(agent, task, simulate_student, verbose=args.verbose)
+        result["trial_id"] = args.trial_id
+        result["agent_name"] = args.agent_name
+        return result
 
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(run_task_wrapper, t): t for t in tasks}
-        for future in as_completed(futures):
+    PER_TASK_TIMEOUT_S = 300  # 5 min hard cap per task; record ERROR and continue
+
+    pool = ThreadPoolExecutor(max_workers=workers)
+    futures = {pool.submit(run_task_wrapper, t): t for t in tasks}
+    pending = set(futures.keys())
+    while pending:
+        done, pending = concurrent.futures.wait(
+            pending, timeout=PER_TASK_TIMEOUT_S,
+            return_when=concurrent.futures.FIRST_COMPLETED,
+        )
+        if not done:
+            # Nothing finished in the last window — declare oldest pending as hung.
+            stuck = next(iter(pending))
+            stuck_task = futures[stuck]
+            tid = stuck_task.get("id")
+            error_result = {
+                "task_id": tid,
+                "topic": stuck_task.get("topic", "unknown"),
+                "passed": False,
+                "error": f"task hung past {PER_TASK_TIMEOUT_S}s timeout",
+                "trial_id": args.trial_id,
+                "agent_name": args.agent_name,
+            }
+            task_results.append(error_result)
+            print(f"  -> TIMEOUT | {tid} | exceeded {PER_TASK_TIMEOUT_S}s", flush=True)
+            stuck.cancel()
+            pending.discard(stuck)
+            continue
+        for future in done:
             task = futures[future]
             tid = task.get("id")
             try:
-                result = future.result()
+                result = future.result(timeout=1)
                 task_results.append(result)
                 status = "PASS" if result["passed"] else "FAIL"
                 print(
                     f"  -> {status} ({result['grading_mode']}) | {tid} | "
                     f"extracted=\"{result['student_extracted_answer']}\" | "
-                    f"correct=\"{result['correct_answer']}\""
+                    f"correct=\"{result['correct_answer']}\"",
+                    flush=True,
                 )
             except Exception as exc:
                 error_result = {
@@ -305,21 +391,32 @@ def main() -> int:
                     "topic": task.get("topic", "unknown"),
                     "passed": False,
                     "error": str(exc),
+                    "trial_id": args.trial_id,
+                    "agent_name": args.agent_name,
                 }
                 task_results.append(error_result)
-                print(f"  -> ERROR | {tid} | {exc}")
+                print(f"  -> ERROR | {tid} | {exc}", flush=True)
+    pool.shutdown(wait=False, cancel_futures=True)
 
     valid_results = [r for r in task_results if "turns_taken" in r]
     summary = aggregate_summary(valid_results)
 
     run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = args.output_dir / f"benchmark_results_{run_ts}.json"
+    label_suffix = f"_{args.label}" if args.label else ""
+    output_path = args.output_dir / f"benchmark_results_{run_ts}{label_suffix}.json"
 
     payload = {
         "run_at": datetime.now().isoformat(),
         "task_file": _task_file_for_record(args.tasks),
         "total_requested_tasks": len(tasks),
+        "trial_id": args.trial_id,
+        "agent_name": args.agent_name,
+        "agent_config": {
+            "enable_teaching_move": not args.no_teaching_move,
+            "enable_transfer_recap": not args.no_transfer_recap,
+            "label": args.label,
+        },
         "summary": summary,
         "results": task_results,
     }
