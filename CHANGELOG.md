@@ -4,6 +4,14 @@ This file summarizes the changes made for the final CS 498 AI Agents submissions
 The same information is also summarized inside the final agent and benchmark
 papers.
 
+## Draft feedback addressed
+
+- Replaced the earlier single-run result with five independent trials over all
+  20 tasks, reporting mean accuracy and standard deviation for the structured
+  agent, same-model single-prompt baseline, and recap-disabled ablation.
+- Added token-level cost estimation using Vertex `count_tokens` and published
+  input/output token prices, reported per tutoring session for each condition.
+
 ## Agent paper
 
 - Completed five independent trials of all 20 benchmark tasks for the structured
@@ -36,4 +44,3 @@ papers.
   reported as 74/100 transfer accuracy.
 - Documented the full task schema, task list, evaluation scripts, and usage
   instructions in `benchmark/README.md`.
-
