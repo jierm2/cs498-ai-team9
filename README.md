@@ -155,8 +155,9 @@ scaffolding (planner + tracker + recap).
 | `benchmark/README.md` | Benchmark protocol, task schema, evaluation rules, validation, limitations |
 | `benchmark/results/aggregated_summary.json` | Canonical accuracy table (mean/std + per-task matrix) — regenerate with `aggregate_runs.py` |
 | `benchmark/results/cost_estimate.json` | Canonical cost table — regenerate with `estimate_cost.py --use-api` |
-| `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json` | Per-trial result JSONs (15 files) the headline numbers come from |
-| `benchmark/run_human_baseline.py` | Optional stdin-driven 5-task human reference runner |
+| `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json` | Per-trial result JSONs (15 files) the headline agent numbers come from |
+| `benchmark/results/human_t*.json` | Five full-20-task human reference runs used in the benchmark paper |
+| `benchmark/run_human_baseline.py` | stdin-driven human reference runner; default 5-task sample, `--all-20` for full trials |
 
 ## Useful commands
 
