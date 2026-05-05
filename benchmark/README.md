@@ -100,6 +100,10 @@ python benchmark/run_benchmark.py --workers 5 --trial-id trial1 --agent-name my_
 # Run the non-agentic LLM baseline
 python benchmark/run_llm_baseline.py --workers 5 --trial-id trial1 --agent-name baseline
 
+# Run the 5-task stdin-driven human baseline
+python benchmark/run_human_baseline.py --author human_tutor
+python benchmark/summarize_human_baseline.py
+
 # Aggregate all results in benchmark/results/
 python benchmark/aggregate_runs.py
 ```
@@ -169,19 +173,24 @@ enough to reconstruct any breakdown.
 Three forms of validation are reported in the benchmark paper:
 
 1. **Agent baseline.** A non-agentic LLM-in-loop tutor (same model, same temperature,
-   same turn budget) reaches 53.3% mean accuracy across 3 trials, well below the
-   three-phase agent's 96.7%. The benchmark distinguishes weak from strong tutors.
+   same turn budget) reaches 49.0% mean accuracy across 5 trials, well below the
+   three-phase agent's 96.0%. The benchmark distinguishes weak from strong tutors.
 2. **Ablation study.** Removing the agent's transfer-question recap drops mean
-   accuracy from 96.7% to 38.3% (below baseline). The benchmark is sensitive to
+   accuracy from 96.0% to 41.0% (below baseline). The benchmark is sensitive to
    architectural changes, not just to model strength.
 3. **Cross-trial consistency.** The agent's standard deviation across trials
-   (5.8 pp) is much lower than the baseline's (15.3 pp). The benchmark is
+   (5.5 pp) is much lower than the baseline's (15.2 pp). The benchmark is
    reliable enough to detect a real architectural advantage despite simulator
    stochasticity.
+4. **Human reference.** `run_human_baseline.py` runs a five-task stratified
+   stdin-driven tutor session against the same simulator and automatic transfer
+   grader. `summarize_human_baseline.py` reports the human score for the
+   benchmark paper.
 
 ## Reproducibility
 
-- All 9 final-experiment result JSONs are checked in under `benchmark/results/`.
+- All 15 final-experiment result JSONs are checked in under `benchmark/results/`
+  for the three automated conditions.
 - `benchmark/results/archive/` contains exploratory runs (different model
   configs, the regex-gated pre-LLM-judge simulator, ablation matrix).
 - `aggregate_runs.py` regenerates the headline table from the result files.
