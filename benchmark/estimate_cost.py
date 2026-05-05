@@ -16,9 +16,9 @@ add a fixed per-call overhead estimate. Tracker/judge prompts include the full
 running dialogue history, which we approximate by summing all prior dialogue
 tokens at each call point.
 
-Pricing reference (Vertex AI Gemini, May 2026):
-- Gemini-3 Flash: $0.30 / 1M input, $2.50 / 1M output
-- Gemini-3.1 Flash-Lite: $0.10 / 1M input, $0.40 / 1M output
+Pricing reference (Vertex AI Gemini standard pricing, May 2026):
+- Gemini 3 Flash Preview: $0.50 / 1M text input, $3.00 / 1M text output
+- Gemini 3.1 Flash-Lite Preview: $0.25 / 1M text input, $1.50 / 1M text output
 
 Usage:
     python benchmark/estimate_cost.py
@@ -37,9 +37,9 @@ RESULTS_DIR = PROJECT_ROOT / "benchmark" / "results"
 
 # Vertex AI Gemini pricing (USD per million tokens)
 PRICING = {
-    "gemini-3-flash-preview": {"input": 0.30, "output": 2.50},
-    "gemini-3.1-flash-lite-preview": {"input": 0.10, "output": 0.40},
-    "gemini-3.1-pro-preview": {"input": 1.25, "output": 10.00},  # for reference
+    "gemini-3-flash-preview": {"input": 0.50, "output": 3.00},
+    "gemini-3.1-flash-lite-preview": {"input": 0.25, "output": 1.50},
+    "gemini-3.1-pro-preview": {"input": 2.00, "output": 12.00},  # for reference, <=200K input tokens
 }
 
 TUTOR_MODEL = "gemini-3-flash-preview"

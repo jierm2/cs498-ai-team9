@@ -17,8 +17,8 @@ than the same LLM run as a single-prompt tutor in a loop?
    LLM baseline using the same model and turn budget.
 3. **An ablation** showing the transfer recap is the load-bearing component:
    removing it drops the agent to **41.0%**, below baseline.
-4. **Per-task cost: <1¢.** The full agent costs $0.0078 per task on average
-   vs $0.0051 for baseline — a 53% cost increase that buys 47 absolute points
+4. **Per-task cost: ~1¢.** The full agent costs $0.0135 per task on average
+   vs $0.0100 for baseline — a 35% cost increase that buys 47 absolute points
    of accuracy.
 
 ## Repo layout
@@ -135,10 +135,10 @@ Cost (Vertex `count_tokens` API, USD):
 
 | Condition                         | Mean / trial | Total (5 trials) | Per task |
 |-----------------------------------|--------------|------------------|----------|
-| Three-phase agent                 | $0.155       | $0.776           | $0.0078  |
-| LLM-in-loop baseline              | $0.103       | $0.515           | $0.0051  |
-| Agent − transfer recap (ablation) | $0.160       | $0.798           | $0.0080  |
-| **Total experiment**              | —            | **$2.09**        | —        |
+| Three-phase agent                 | $0.271       | $1.353           | $0.0135  |
+| LLM-in-loop baseline              | $0.200       | $1.002           | $0.0100  |
+| Agent − transfer recap (ablation) | $0.278       | $1.388           | $0.0139  |
+| **Total experiment**              | —            | **$3.74**        | —        |
 
 All conditions: tutor and baseline use Gemini-3 Flash at temperature 1.0; the
 student simulator and judge use Gemini-3.1 Flash-Lite. Same task set, same turn
