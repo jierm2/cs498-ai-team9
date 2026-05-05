@@ -13,10 +13,13 @@ than the same LLM run as a single-prompt tutor in a loop?
    resists correction until presented with semantically meaningful evidence.
 2. **A three-phase tutoring agent** (probe → confront → teach → confirm) with
    an LLM tracker, a state-machine planner, and a transfer-question recap that
-   reaches **96.7%** accuracy across 3 trials, vs **53.3%** for a non-agentic
+   reaches **96.0%** accuracy across 5 trials, vs **49.0%** for a non-agentic
    LLM baseline using the same model and turn budget.
 3. **An ablation** showing the transfer recap is the load-bearing component:
-   removing it drops the agent to **38.3%**, below baseline.
+   removing it drops the agent to **41.0%**, below baseline.
+4. **Per-task cost: <1¢.** The full agent costs $0.0078 per task on average
+   vs $0.0051 for baseline — a 53% cost increase that buys 47 absolute points
+   of accuracy.
 
 ## Repo layout
 
@@ -32,8 +35,11 @@ benchmark/
 ├── run_benchmark.py           # run the agent against the simulator
 ├── run_llm_baseline.py        # non-agentic LLM-in-loop baseline
 ├── aggregate_runs.py          # mean/std accuracy across trials, per-task table
+├── estimate_cost.py           # per-condition USD cost via Vertex count_tokens
 ├── README.md                  # benchmark protocol + task schema (Assignment 6)
-└── results/                   # 9 final-experiment JSONs (3 conditions × 3 trials)
+└── results/                   # 15 final-experiment JSONs (3 conditions × 5 trials)
+    ├── aggregated_summary.json    # canonical accuracy summary
+    ├── cost_estimate.json         # canonical cost summary
     └── archive/               # exploratory / pre-final-experiment runs
 archive/                       # connectivity demos and an early task draft
 requirements.txt
@@ -85,7 +91,7 @@ Should print one PASS line and an accuracy summary in ~1–2 minutes.
 
 ## Reproduce the experiment
 
-The headline result is 3 trials × 3 conditions = 9 runs of 20 tasks each.
+The headline result is 5 trials × 3 conditions = 15 runs of 20 tasks each.
 
 > **Run these commands one at a time, sequentially.** Launching them in
 > parallel can stress the Vertex API and cause individual runs to hang. The
@@ -93,32 +99,44 @@ The headline result is 3 trials × 3 conditions = 9 runs of 20 tasks each.
 > faster (and friendlier to the API) to run sequentially.
 
 ```bash
-# Full agent (3 trials)
-python3 benchmark/run_benchmark.py --workers 5 --trial-id trial1 --agent-name three_phase_agent --label agent_t1
-python3 benchmark/run_benchmark.py --workers 5 --trial-id trial2 --agent-name three_phase_agent --label agent_t2
-python3 benchmark/run_benchmark.py --workers 5 --trial-id trial3 --agent-name three_phase_agent --label agent_t3
+# Full agent (5 trials)
+for t in trial1 trial2 trial3 trial4 trial5; do
+  python3 benchmark/run_benchmark.py --workers 5 --trial-id $t --agent-name three_phase_agent --label agent_${t#trial}
+done
 
-# Non-agentic baseline (3 trials)
-python3 benchmark/run_llm_baseline.py --workers 5 --trial-id trial1 --agent-name baseline --label baseline_t1
-python3 benchmark/run_llm_baseline.py --workers 5 --trial-id trial2 --agent-name baseline --label baseline_t2
-python3 benchmark/run_llm_baseline.py --workers 5 --trial-id trial3 --agent-name baseline --label baseline_t3
+# Non-agentic baseline (5 trials)
+for t in trial1 trial2 trial3 trial4 trial5; do
+  python3 benchmark/run_llm_baseline.py --workers 5 --trial-id $t --agent-name baseline --label baseline_${t#trial}
+done
 
-# Ablation: agent without the transfer-question recap (3 trials)
-python3 benchmark/run_benchmark.py --workers 5 --trial-id trial1 --agent-name agent_no_recap --label no_recap_t1 --no-transfer-recap
-python3 benchmark/run_benchmark.py --workers 5 --trial-id trial2 --agent-name agent_no_recap --label no_recap_t2 --no-transfer-recap
-python3 benchmark/run_benchmark.py --workers 5 --trial-id trial3 --agent-name agent_no_recap --label no_recap_t3 --no-transfer-recap
+# Ablation: agent without transfer-question recap (5 trials)
+for t in trial1 trial2 trial3 trial4 trial5; do
+  python3 benchmark/run_benchmark.py --workers 5 --trial-id $t --agent-name agent_no_recap --label no_recap_${t#trial} --no-transfer-recap
+done
 
-# Aggregate (reads everything in benchmark/results/)
+# Aggregate accuracy and estimate cost
 python3 benchmark/aggregate_runs.py
+python3 benchmark/estimate_cost.py --use-api
 ```
 
 ## Headline results
 
-| Condition                         | Trials              | Mean accuracy | Std  |
-|-----------------------------------|---------------------|---------------|------|
-| Three-phase agent                 | 20/20, 20/20, 18/20 | **96.7%**     | 5.8  |
-| LLM-in-loop baseline              | 14/20, 8/20, 10/20  | 53.3%         | 15.3 |
-| Agent − transfer recap (ablation) | 11/20, 6/20, 6/20   | 38.3%         | 14.4 |
+Accuracy (5 trials × 20 tasks each):
+
+| Condition                         | Per-trial accuracies                          | Mean      | Std  |
+|-----------------------------------|------------------------------------------------|-----------|------|
+| Three-phase agent                 | 20/20, 20/20, 18/20, 18/20, 20/20             | **96.0%** | 5.5  |
+| LLM-in-loop baseline              | 14/20, 8/20, 10/20, 11/20, 6/20               | 49.0%     | 15.2 |
+| Agent − transfer recap (ablation) | 11/20, 6/20, 6/20, 7/20, 11/20                | 41.0%     | 12.9 |
+
+Cost (Vertex `count_tokens` API, USD):
+
+| Condition                         | Mean / trial | Total (5 trials) | Per task |
+|-----------------------------------|--------------|------------------|----------|
+| Three-phase agent                 | $0.155       | $0.776           | $0.0078  |
+| LLM-in-loop baseline              | $0.103       | $0.515           | $0.0051  |
+| Agent − transfer recap (ablation) | $0.160       | $0.798           | $0.0080  |
+| **Total experiment**              | —            | **$2.09**        | —        |
 
 All conditions: tutor and baseline use Gemini-3 Flash at temperature 1.0; the
 student simulator and judge use Gemini-3.1 Flash-Lite. Same task set, same turn
@@ -133,7 +151,9 @@ scaffolding (planner + tracker + recap).
 | `src/simulator/student_simulator.py` | `_correction_unlocked` is the LLM-judged gate; `simulate_student` runs the student LLM |
 | `benchmark/benchmark.json` | All 20 task specifications |
 | `benchmark/README.md` | Benchmark protocol, task schema, evaluation rules, validation, limitations |
-| `benchmark/results/` | The 9 final-experiment result JSONs the headline numbers come from |
+| `benchmark/results/aggregated_summary.json` | Canonical accuracy table (mean/std + per-task matrix) — regenerate with `aggregate_runs.py` |
+| `benchmark/results/cost_estimate.json` | Canonical cost table — regenerate with `estimate_cost.py --use-api` |
+| `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json` | Per-trial result JSONs (15 files) the headline numbers come from |
 
 ## Useful commands
 

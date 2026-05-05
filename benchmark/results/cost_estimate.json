@@ -1,0 +1,366 @@
+{
+  "method": "vertex_count_tokens_api",
+  "pricing_usd_per_million": {
+    "gemini-3-flash-preview": {
+      "input": 0.3,
+      "output": 2.5
+    },
+    "gemini-3.1-flash-lite-preview": {
+      "input": 0.1,
+      "output": 0.4
+    }
+  },
+  "by_condition": {
+    "agent_no_recap": {
+      "n_trials": 5,
+      "mean_cost_per_trial_usd": 0.1596,
+      "total_cost_usd": 0.7979,
+      "mean_cost_per_task_usd": 0.008
+    },
+    "three_phase_agent": {
+      "n_trials": 5,
+      "mean_cost_per_trial_usd": 0.1551,
+      "total_cost_usd": 0.7756,
+      "mean_cost_per_task_usd": 0.0078
+    },
+    "baseline": {
+      "n_trials": 5,
+      "mean_cost_per_trial_usd": 0.1029,
+      "total_cost_usd": 0.5145,
+      "mean_cost_per_task_usd": 0.0051
+    }
+  },
+  "grand_total_usd": 2.088,
+  "per_run": [
+    {
+      "file": "ablation_no_recap_t1.json",
+      "agent_name": "agent_no_recap",
+      "trial_id": "trial1",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 100467,
+        "tutor_output_tok": 11714,
+        "tracker_input_tok": 127481,
+        "tracker_output_tok": 9180,
+        "simulator_input_tok": 167250,
+        "simulator_output_tok": 11469,
+        "judge_input_tok": 154186,
+        "judge_output_tok": 6120,
+        "n_tutor_calls": 153,
+        "n_tracker_calls": 153,
+        "n_simulator_calls": 173,
+        "n_judge_calls": 153
+      },
+      "estimated_cost_usd": 0.1598,
+      "cost_per_task_usd": 0.008
+    },
+    {
+      "file": "ablation_no_recap_t2.json",
+      "agent_name": "agent_no_recap",
+      "trial_id": "trial2",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 101793,
+        "tutor_output_tok": 11956,
+        "tracker_input_tok": 129349,
+        "tracker_output_tok": 9360,
+        "simulator_input_tok": 169367,
+        "simulator_output_tok": 11325,
+        "judge_input_tok": 156211,
+        "judge_output_tok": 6240,
+        "n_tutor_calls": 156,
+        "n_tracker_calls": 156,
+        "n_simulator_calls": 176,
+        "n_judge_calls": 156
+      },
+      "estimated_cost_usd": 0.1622,
+      "cost_per_task_usd": 0.0081
+    },
+    {
+      "file": "ablation_no_recap_t3.json",
+      "agent_name": "agent_no_recap",
+      "trial_id": "trial3",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 101837,
+        "tutor_output_tok": 11494,
+        "tracker_input_tok": 128731,
+        "tracker_output_tok": 9240,
+        "simulator_input_tok": 168817,
+        "simulator_output_tok": 11955,
+        "judge_input_tok": 156023,
+        "judge_output_tok": 6160,
+        "n_tutor_calls": 154,
+        "n_tracker_calls": 154,
+        "n_simulator_calls": 174,
+        "n_judge_calls": 154
+      },
+      "estimated_cost_usd": 0.1607,
+      "cost_per_task_usd": 0.008
+    },
+    {
+      "file": "ablation_no_recap_t4.json",
+      "agent_name": "agent_no_recap",
+      "trial_id": "trial4",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 96500,
+        "tutor_output_tok": 11312,
+        "tracker_input_tok": 122612,
+        "tracker_output_tok": 8880,
+        "simulator_input_tok": 161415,
+        "simulator_output_tok": 11152,
+        "judge_input_tok": 148503,
+        "judge_output_tok": 5920,
+        "n_tutor_calls": 148,
+        "n_tracker_calls": 148,
+        "n_simulator_calls": 168,
+        "n_judge_calls": 148
+      },
+      "estimated_cost_usd": 0.154,
+      "cost_per_task_usd": 0.0077
+    },
+    {
+      "file": "ablation_no_recap_t5.json",
+      "agent_name": "agent_no_recap",
+      "trial_id": "trial5",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 102032,
+        "tutor_output_tok": 11597,
+        "tracker_input_tok": 129029,
+        "tracker_output_tok": 9240,
+        "simulator_input_tok": 169264,
+        "simulator_output_tok": 12000,
+        "judge_input_tok": 156367,
+        "judge_output_tok": 6160,
+        "n_tutor_calls": 154,
+        "n_tracker_calls": 154,
+        "n_simulator_calls": 174,
+        "n_judge_calls": 154
+      },
+      "estimated_cost_usd": 0.1612,
+      "cost_per_task_usd": 0.0081
+    },
+    {
+      "file": "agent_t1.json",
+      "agent_name": "three_phase_agent",
+      "trial_id": "trial1",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 94593,
+        "tutor_output_tok": 11101,
+        "tracker_input_tok": 120394,
+        "tracker_output_tok": 8820,
+        "simulator_input_tok": 159077,
+        "simulator_output_tok": 11300,
+        "judge_input_tok": 146326,
+        "judge_output_tok": 5880,
+        "n_tutor_calls": 147,
+        "n_tracker_calls": 147,
+        "n_simulator_calls": 167,
+        "n_judge_calls": 147
+      },
+      "estimated_cost_usd": 0.1517,
+      "cost_per_task_usd": 0.0076
+    },
+    {
+      "file": "agent_t2.json",
+      "agent_name": "three_phase_agent",
+      "trial_id": "trial2",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 101579,
+        "tutor_output_tok": 11590,
+        "tracker_input_tok": 128569,
+        "tracker_output_tok": 9240,
+        "simulator_input_tok": 168648,
+        "simulator_output_tok": 11858,
+        "judge_input_tok": 155758,
+        "judge_output_tok": 6160,
+        "n_tutor_calls": 154,
+        "n_tracker_calls": 154,
+        "n_simulator_calls": 174,
+        "n_judge_calls": 154
+      },
+      "estimated_cost_usd": 0.1608,
+      "cost_per_task_usd": 0.008
+    },
+    {
+      "file": "agent_t3.json",
+      "agent_name": "three_phase_agent",
+      "trial_id": "trial3",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 96378,
+        "tutor_output_tok": 11125,
+        "tracker_input_tok": 122003,
+        "tracker_output_tok": 8700,
+        "simulator_input_tok": 160092,
+        "simulator_output_tok": 11235,
+        "judge_input_tok": 147667,
+        "judge_output_tok": 5800,
+        "n_tutor_calls": 145,
+        "n_tracker_calls": 145,
+        "n_simulator_calls": 164,
+        "n_judge_calls": 145
+      },
+      "estimated_cost_usd": 0.1527,
+      "cost_per_task_usd": 0.0076
+    },
+    {
+      "file": "agent_t4.json",
+      "agent_name": "three_phase_agent",
+      "trial_id": "trial4",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 93102,
+        "tutor_output_tok": 10753,
+        "tracker_input_tok": 118155,
+        "tracker_output_tok": 8580,
+        "simulator_input_tok": 155849,
+        "simulator_output_tok": 11311,
+        "judge_input_tok": 143696,
+        "judge_output_tok": 5720,
+        "n_tutor_calls": 143,
+        "n_tracker_calls": 143,
+        "n_simulator_calls": 162,
+        "n_judge_calls": 143
+      },
+      "estimated_cost_usd": 0.1485,
+      "cost_per_task_usd": 0.0074
+    },
+    {
+      "file": "agent_t5.json",
+      "agent_name": "three_phase_agent",
+      "trial_id": "trial5",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 102218,
+        "tutor_output_tok": 11835,
+        "tracker_input_tok": 129353,
+        "tracker_output_tok": 9180,
+        "simulator_input_tok": 169705,
+        "simulator_output_tok": 11936,
+        "judge_input_tok": 156520,
+        "judge_output_tok": 6120,
+        "n_tutor_calls": 153,
+        "n_tracker_calls": 153,
+        "n_simulator_calls": 173,
+        "n_judge_calls": 153
+      },
+      "estimated_cost_usd": 0.1619,
+      "cost_per_task_usd": 0.0081
+    },
+    {
+      "file": "baseline_t1.json",
+      "agent_name": "baseline",
+      "trial_id": "trial1",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 108785,
+        "tutor_output_tok": 11914,
+        "tracker_input_tok": 0,
+        "tracker_output_tok": 0,
+        "simulator_input_tok": 178018,
+        "simulator_output_tok": 12477,
+        "judge_input_tok": 165104,
+        "judge_output_tok": 6400,
+        "n_tutor_calls": 160,
+        "n_tracker_calls": 0,
+        "n_simulator_calls": 180,
+        "n_judge_calls": 160
+      },
+      "estimated_cost_usd": 0.1043,
+      "cost_per_task_usd": 0.0052
+    },
+    {
+      "file": "baseline_t2.json",
+      "agent_name": "baseline",
+      "trial_id": "trial2",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 105972,
+        "tutor_output_tok": 11760,
+        "tracker_input_tok": 0,
+        "tracker_output_tok": 0,
+        "simulator_input_tok": 174420,
+        "simulator_output_tok": 11995,
+        "judge_input_tok": 161660,
+        "judge_output_tok": 6400,
+        "n_tutor_calls": 160,
+        "n_tracker_calls": 0,
+        "n_simulator_calls": 180,
+        "n_judge_calls": 160
+      },
+      "estimated_cost_usd": 0.1022,
+      "cost_per_task_usd": 0.0051
+    },
+    {
+      "file": "baseline_t3.json",
+      "agent_name": "baseline",
+      "trial_id": "trial3",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 107083,
+        "tutor_output_tok": 11926,
+        "tracker_input_tok": 0,
+        "tracker_output_tok": 0,
+        "simulator_input_tok": 175734,
+        "simulator_output_tok": 11868,
+        "judge_input_tok": 162808,
+        "judge_output_tok": 6400,
+        "n_tutor_calls": 160,
+        "n_tracker_calls": 0,
+        "n_simulator_calls": 180,
+        "n_judge_calls": 160
+      },
+      "estimated_cost_usd": 0.1031,
+      "cost_per_task_usd": 0.0052
+    },
+    {
+      "file": "baseline_t4.json",
+      "agent_name": "baseline",
+      "trial_id": "trial4",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 104662,
+        "tutor_output_tok": 11553,
+        "tracker_input_tok": 0,
+        "tracker_output_tok": 0,
+        "simulator_input_tok": 172355,
+        "simulator_output_tok": 11655,
+        "judge_input_tok": 159802,
+        "judge_output_tok": 6400,
+        "n_tutor_calls": 160,
+        "n_tracker_calls": 0,
+        "n_simulator_calls": 180,
+        "n_judge_calls": 160
+      },
+      "estimated_cost_usd": 0.1007,
+      "cost_per_task_usd": 0.005
+    },
+    {
+      "file": "baseline_t5.json",
+      "agent_name": "baseline",
+      "trial_id": "trial5",
+      "n_tasks": 20,
+      "counts": {
+        "tutor_input_tok": 108526,
+        "tutor_output_tok": 11889,
+        "tracker_input_tok": 0,
+        "tracker_output_tok": 0,
+        "simulator_input_tok": 177825,
+        "simulator_output_tok": 12595,
+        "judge_input_tok": 164936,
+        "judge_output_tok": 6400,
+        "n_tutor_calls": 160,
+        "n_tracker_calls": 0,
+        "n_simulator_calls": 180,
+        "n_judge_calls": 160
+      },
+      "estimated_cost_usd": 0.1042,
+      "cost_per_task_usd": 0.0052
+    }
+  ]
+}
