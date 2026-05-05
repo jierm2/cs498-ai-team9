@@ -21,6 +21,38 @@ than the same LLM run as a single-prompt tutor in a loop?
    vs $0.0100 for baseline — a 35% cost increase that buys 47 absolute points
    of accuracy.
 
+## Submission map
+
+Use this section to locate the supplementary materials referenced from the
+Canvas PDF submissions.
+
+### Agent paper checklist
+
+| Requirement | Location |
+|---|---|
+| Final agent paper PDF | Canvas PDF upload |
+| Changelog from draft | Agent paper, `Changelog` paragraph |
+| Agent source code with documentation | `agent.py`, `src/`, and this README |
+| Setup and reproduction README | `README.md` |
+| Evaluation scripts | `benchmark/run_benchmark.py`, `benchmark/run_llm_baseline.py`, `benchmark/aggregate_runs.py`, `benchmark/estimate_cost.py` |
+| Requirements/dependencies | `requirements.txt` |
+| Experimental results | `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json`, `aggregated_summary.json` |
+| Statistical analysis | Agent paper Table 1 and `benchmark/results/aggregated_summary.json` |
+| TA feedback addressed | Agent paper `Changelog` paragraph |
+
+### Benchmark paper checklist
+
+| Requirement | Location |
+|---|---|
+| Final benchmark paper PDF | Canvas PDF upload |
+| Changelog from draft | Benchmark paper, `Changelog` paragraph |
+| Complete task specifications | `benchmark/benchmark.json` and `benchmark/README.md` |
+| Evaluation code with README | `benchmark/run_benchmark.py`, `benchmark/run_llm_baseline.py`, `benchmark/run_human_baseline.py`, `benchmark/aggregate_runs.py`, `benchmark/README.md` |
+| Data/resources needed to run benchmark | `benchmark/benchmark.json`, `requirements.txt`, and Vertex AI credentials described below |
+| Usage documentation | `README.md` and `benchmark/README.md` |
+| Validation results | `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json`, `human_t*.json`, `aggregated_summary.json` |
+| TA feedback addressed | Benchmark paper `Changelog` paragraph |
+
 ## Repo layout
 
 ```
@@ -34,12 +66,12 @@ benchmark/
 ├── benchmark.json             # 20 task specifications
 ├── run_benchmark.py           # run the agent against the simulator
 ├── run_llm_baseline.py        # non-agentic LLM-in-loop baseline
-├── run_human_baseline.py      # stdin-driven 5-task human reference run
+├── run_human_baseline.py      # stdin-driven human reference runner
 ├── summarize_human_baseline.py # summarize human reference JSONs
 ├── aggregate_runs.py          # mean/std accuracy across trials, per-task table
 ├── estimate_cost.py           # per-condition USD cost via Vertex count_tokens
 ├── README.md                  # benchmark protocol + task schema (Assignment 6)
-└── results/                   # 15 final-experiment JSONs (3 conditions × 5 trials)
+└── results/                   # final experiment and human reference JSONs
     ├── aggregated_summary.json    # canonical accuracy summary
     ├── cost_estimate.json         # canonical cost summary
     └── archive/               # exploratory / pre-final-experiment runs
