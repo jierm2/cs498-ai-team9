@@ -31,27 +31,27 @@ Canvas PDF submissions.
 | Requirement | Location |
 |---|---|
 | Final agent paper PDF | Canvas PDF upload |
-| Changelog from draft | Agent paper, `Changelog` paragraph |
+| Changelog from draft | Agent paper, `Changelog` paragraph, and `CHANGELOG.md` |
 | Agent source code with documentation | `agent.py`, `src/`, and this README |
 | Setup and reproduction README | `README.md` |
 | Evaluation scripts | `benchmark/run_benchmark.py`, `benchmark/run_llm_baseline.py`, `benchmark/aggregate_runs.py`, `benchmark/estimate_cost.py` |
 | Requirements/dependencies | `requirements.txt` |
 | Experimental results | `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json`, `aggregated_summary.json` |
 | Statistical analysis | Agent paper Table 1 and `benchmark/results/aggregated_summary.json` |
-| TA feedback addressed | Agent paper `Changelog` paragraph |
+| TA feedback addressed | Agent paper `Changelog` paragraph and `CHANGELOG.md` |
 
 ### Benchmark paper checklist
 
 | Requirement | Location |
 |---|---|
 | Final benchmark paper PDF | Canvas PDF upload |
-| Changelog from draft | Benchmark paper, `Changelog` paragraph |
+| Changelog from draft | Benchmark paper, `Changelog` paragraph, and `CHANGELOG.md` |
 | Complete task specifications | `benchmark/benchmark.json` and `benchmark/README.md` |
 | Evaluation code with README | `benchmark/run_benchmark.py`, `benchmark/run_llm_baseline.py`, `benchmark/run_human_baseline.py`, `benchmark/aggregate_runs.py`, `benchmark/README.md` |
 | Data/resources needed to run benchmark | `benchmark/benchmark.json`, `requirements.txt`, and Vertex AI credentials described below |
 | Usage documentation | `README.md` and `benchmark/README.md` |
 | Validation results | `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json`, `human_t*.json`, `aggregated_summary.json` |
-| TA feedback addressed | Benchmark paper `Changelog` paragraph |
+| TA feedback addressed | Benchmark paper `Changelog` paragraph and `CHANGELOG.md` |
 
 ## Repo layout
 
@@ -76,6 +76,7 @@ benchmark/
     ├── cost_estimate.json         # canonical cost summary
     └── archive/               # exploratory / pre-final-experiment runs
 archive/                       # connectivity demos and an early task draft
+CHANGELOG.md                   # draft-to-final changes and TA-feedback response
 requirements.txt
 ```
 
