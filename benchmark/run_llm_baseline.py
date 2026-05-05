@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
 import re
 import sys
@@ -266,19 +267,45 @@ def main() -> int:
         result["agent_name"] = args.agent_name
         return result
 
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(run_task_wrapper, t): t for t in tasks}
-        for future in as_completed(futures):
+    PER_TASK_TIMEOUT_S = 300  # 5 min hard cap per task; record TIMEOUT and continue
+    pool = ThreadPoolExecutor(max_workers=workers)
+    futures = {pool.submit(run_task_wrapper, t): t for t in tasks}
+    pending = set(futures.keys())
+    while pending:
+        done, pending = concurrent.futures.wait(
+            pending, timeout=PER_TASK_TIMEOUT_S,
+            return_when=concurrent.futures.FIRST_COMPLETED,
+        )
+        if not done:
+            stuck = next(iter(pending))
+            stuck_task = futures[stuck]
+            tid = stuck_task.get("id")
+            error_result = {
+                "task_id": tid,
+                "topic": stuck_task.get("topic", "unknown"),
+                "passed": False,
+                "error": f"task hung past {PER_TASK_TIMEOUT_S}s timeout",
+                "model": args.model,
+                "trial_id": args.trial_id,
+                "agent_name": args.agent_name,
+            }
+            task_results.append(error_result)
+            print(f"  -> TIMEOUT | {tid} | exceeded {PER_TASK_TIMEOUT_S}s", flush=True)
+            stuck.cancel()
+            pending.discard(stuck)
+            continue
+        for future in done:
             task = futures[future]
             tid = task.get("id")
             try:
-                result = future.result()
+                result = future.result(timeout=1)
                 task_results.append(result)
                 status = "PASS" if result["passed"] else "FAIL"
                 print(
                     f"  -> {status} ({result['grading_mode']}) | {tid} | "
                     f"extracted=\"{result['llm_extracted_answer']}\" | "
-                    f"correct=\"{result['correct_answer']}\""
+                    f"correct=\"{result['correct_answer']}\"",
+                    flush=True,
                 )
             except Exception as exc:
                 error_result = {
@@ -291,7 +318,8 @@ def main() -> int:
                     "agent_name": args.agent_name,
                 }
                 task_results.append(error_result)
-                print(f"  -> ERROR | {tid} | {exc}")
+                print(f"  -> ERROR | {tid} | {exc}", flush=True)
+    pool.shutdown(wait=False, cancel_futures=True)
 
     valid_results = [r for r in task_results if "llm_answer" in r]
     summary = aggregate_summary(valid_results)

@@ -1,23 +1,29 @@
 {
-  "generated_at": "2026-05-04T16:49:11.078299",
+  "generated_at": "2026-05-04T20:17:50.701198",
   "results_dir": "benchmark/results",
-  "n_input_files": 9,
+  "n_input_files": 15,
   "input_files": [
     "ablation_no_recap_t1.json",
     "ablation_no_recap_t2.json",
     "ablation_no_recap_t3.json",
+    "ablation_no_recap_t4.json",
+    "ablation_no_recap_t5.json",
     "agent_t1.json",
     "agent_t2.json",
     "agent_t3.json",
+    "agent_t4.json",
+    "agent_t5.json",
     "baseline_t1.json",
     "baseline_t2.json",
-    "baseline_t3.json"
+    "baseline_t3.json",
+    "baseline_t4.json",
+    "baseline_t5.json"
   ],
   "by_condition": {
     "agent_no_recap": {
-      "n_trials": 3,
-      "mean_accuracy": 0.38333333333333336,
-      "std_accuracy": 0.14433756729740646,
+      "n_trials": 5,
+      "mean_accuracy": 0.41000000000000003,
+      "std_accuracy": 0.12942179105544788,
       "trials": [
         {
           "trial_id": "trial1",
@@ -39,13 +45,27 @@
           "total": 20,
           "accuracy": 0.3,
           "source_file": "ablation_no_recap_t3.json"
+        },
+        {
+          "trial_id": "trial4",
+          "passed": 7,
+          "total": 20,
+          "accuracy": 0.35,
+          "source_file": "ablation_no_recap_t4.json"
+        },
+        {
+          "trial_id": "trial5",
+          "passed": 11,
+          "total": 20,
+          "accuracy": 0.55,
+          "source_file": "ablation_no_recap_t5.json"
         }
       ]
     },
     "three_phase_agent": {
-      "n_trials": 3,
-      "mean_accuracy": 0.9666666666666667,
-      "std_accuracy": 0.05773502691896256,
+      "n_trials": 5,
+      "mean_accuracy": 0.96,
+      "std_accuracy": 0.0547722557505166,
       "trials": [
         {
           "trial_id": "trial1",
@@ -67,13 +87,27 @@
           "total": 20,
           "accuracy": 0.9,
           "source_file": "agent_t3.json"
+        },
+        {
+          "trial_id": "trial4",
+          "passed": 18,
+          "total": 20,
+          "accuracy": 0.9,
+          "source_file": "agent_t4.json"
+        },
+        {
+          "trial_id": "trial5",
+          "passed": 20,
+          "total": 20,
+          "accuracy": 1.0,
+          "source_file": "agent_t5.json"
         }
       ]
     },
     "baseline": {
-      "n_trials": 3,
-      "mean_accuracy": 0.5333333333333333,
-      "std_accuracy": 0.15275252316519464,
+      "n_trials": 5,
+      "mean_accuracy": 0.49,
+      "std_accuracy": 0.151657508881031,
       "trials": [
         {
           "trial_id": "trial1",
@@ -95,6 +129,20 @@
           "total": 20,
           "accuracy": 0.5,
           "source_file": "baseline_t3.json"
+        },
+        {
+          "trial_id": "trial4",
+          "passed": 11,
+          "total": 20,
+          "accuracy": 0.55,
+          "source_file": "baseline_t4.json"
+        },
+        {
+          "trial_id": "trial5",
+          "passed": 6,
+          "total": 20,
+          "accuracy": 0.3,
+          "source_file": "baseline_t5.json"
         }
       ]
     }
@@ -104,340 +152,460 @@
       "agent_no_recap": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "algebra_02_combine_unlike_terms": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": false
       },
       "baseline": {
         "trial1": true,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "algebra_03_division_distributes_over_sum_in_numerator_termwise_to_denominator": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "algebra_04_solving_equation_misapplies_distribution": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": false,
+        "trial5": true
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "algebra_05_equals_sign_as_next_step": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       },
       "baseline": {
         "trial1": false,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       }
     },
     "fractions_01_add_num_den": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": false,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "fractions_02_subtract_num_den": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": false,
+        "trial5": true
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "fractions_03_bigger_denominator_bigger_fraction": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "baseline": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "fractions_04_multiply_across_in_addition": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "fractions_05_whole_number_not_as_fraction": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "geometry_01_perimeter_area_confusion": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": false,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "geometry_02_all_triangles_angle_sum_270": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "baseline": {
         "trial1": false,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "geometry_03_bigger_area_means_bigger_perimeter": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": true,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "geometry_04_diameter_radius_confusion": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "geometry_05_volume_vs_surface_area_confusion": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "negative_01_neg_times_neg_negative": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": false
       },
       "baseline": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "negative_02_add_negatives_always_negative": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": false,
+        "trial5": true
       },
       "baseline": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "negative_03_subtracting_negative_same_as_subtracting_positive": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": true,
+        "trial5": true
       },
       "baseline": {
         "trial1": false,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "negative_04_ordering_by_absolute_value": {
       "agent_no_recap": {
         "trial1": false,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": false
       },
       "baseline": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": true
       }
     },
     "negative_05_distribute_negative_sign_incorrectly": {
       "agent_no_recap": {
         "trial1": true,
         "trial2": false,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       },
       "baseline": {
         "trial1": true,
         "trial2": true,
-        "trial3": true
+        "trial3": true,
+        "trial4": true,
+        "trial5": false
       },
       "three_phase_agent": {
         "trial1": true,
         "trial2": true,
-        "trial3": false
+        "trial3": false,
+        "trial4": false,
+        "trial5": true
       }
     }
   }
