@@ -34,6 +34,8 @@ benchmark/
 ├── benchmark.json             # 20 task specifications
 ├── run_benchmark.py           # run the agent against the simulator
 ├── run_llm_baseline.py        # non-agentic LLM-in-loop baseline
+├── run_human_baseline.py      # stdin-driven 5-task human reference run
+├── summarize_human_baseline.py # summarize human reference JSONs
 ├── aggregate_runs.py          # mean/std accuracy across trials, per-task table
 ├── estimate_cost.py           # per-condition USD cost via Vertex count_tokens
 ├── README.md                  # benchmark protocol + task schema (Assignment 6)
@@ -154,6 +156,7 @@ scaffolding (planner + tracker + recap).
 | `benchmark/results/aggregated_summary.json` | Canonical accuracy table (mean/std + per-task matrix) — regenerate with `aggregate_runs.py` |
 | `benchmark/results/cost_estimate.json` | Canonical cost table — regenerate with `estimate_cost.py --use-api` |
 | `benchmark/results/agent_t*.json`, `baseline_t*.json`, `ablation_no_recap_t*.json` | Per-trial result JSONs (15 files) the headline numbers come from |
+| `benchmark/run_human_baseline.py` | Optional stdin-driven 5-task human reference runner |
 
 ## Useful commands
 
@@ -179,7 +182,7 @@ python3 benchmark/aggregate_runs.py
   and an early task-format draft (`data/tasks.json`); none of them are
   imported by the live code.
 - `benchmark/results/archive/` contains exploratory runs from before we settled
-  on the final 3-trial × 3-condition design.
+  on the final 5-trial × 3-condition design.
 
 ## License / disclaimer
 
